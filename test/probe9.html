@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><meta charset="utf-8">
+<body style="margin:0">
+<iframe id="f" src="../index.html" style="width:390px;height:900px;border:1px solid #ccc"></iframe>
+<pre id="r">PENDING</pre>
+<script>
+const log = [];
+const ok = (c, m) => log.push((c ? 'PASS ' : 'FAIL ') + m);
+window.onload = () => setTimeout(run, 400);
+function run() {
+  const d = document.getElementById('f').contentDocument;
+  const w = document.getElementById('f').contentWindow;
+  if (!d || !w) { document.getElementById('r').textContent = 'FAIL no iframe doc'; return; }
+  const $ = id => d.getElementById(id);
+
+  ok(!!$('topnav') && $('topnav').querySelectorAll('button').length === 5, '顶部导航 5 个页签');
+  ok(d.querySelector('.brand .bn').textContent === '囤货算盘', '品牌名「囤货算盘」');
+  ok(d.title.indexOf('Stock or Stop') >= 0, '标题含英文名 Stock or Stop');
+  ok(!!d.querySelector('.split .col-result #k-out'), '结论面板在右栏（DOM 上与输入分列）');
+  ok(!!d.querySelector('#k-out .rhero'), '结论面板有大标题 hero');
+
+  // 页面切换：计算方法
+  const aboutBtn = d.querySelector('#topnav [data-page=pg-about]');
+  aboutBtn.click();
+  ok($('pg-about').classList.contains('active') && !$('pg-main').classList.contains('active'), '点「计算方法」→ 说明页显示、主页隐藏');
+  ok($('pg-about').textContent.indexOf('先到期先用') >= 0, '说明页包含消耗规则解释');
+  d.querySelector('#topnav [data-page=pg-main]').click();
+  ok($('pg-main').classList.contains('active'), '切回主流程');
+
+  // 比价页
+  d.querySelector('#topnav [data-page=pg-cmp]').click();
+  ok($('pg-cmp').classList.contains('active'), '比价页可切换');
+  ok($('cmp-sync').textContent.indexOf('先到期先用') >= 0, '比价提示写明口径');
+  ok($('offers-out').innerHTML.indexOf('<table') >= 0, '比价表格正常渲染');
+  ok($('offers-out').textContent.indexOf('浪费') >= 0 || $('offers-out').textContent.indexOf('最优') >= 0, '比价有可用/浪费信息');
+  d.querySelector('#topnav [data-page=pg-vs]').click();
+  ok($('vs-sync').textContent.indexOf('真实到期日') >= 0, '预售提示写明真实到期日');
+
+  document.getElementById('r').textContent = log.join('\n');
+  document.title = log.some(l => l.startsWith('FAIL')) ? 'HASFAIL' : 'ALLPASS';
+}
+</script></body></html>

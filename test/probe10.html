@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html><meta charset="utf-8"><body style="margin:0">
+<iframe id="f" src="../index.html" style="width:1240px;height:900px;border:none"></iframe>
+<pre id="r"></pre>
+<script>
+const out = []; let pass = 0, fail = 0;
+function ok(c, m) { if (c) { pass++; } else { fail++; out.push('✗ ' + m); } }
+window.onerror = function (m) { out.push('OUTER-ERR ' + m); };
+setTimeout(() => {
+  try {
+    const w = document.getElementById('f').contentWindow, d = w.document;
+    ['sec-main','sec-cmp','sec-vs','sec-group','sec-about'].forEach(id =>
+      ok(d.getElementById(id) && d.getElementById(id).offsetHeight > 0, id + ' 应始终可见（锚点单页）'));
+    const dh = d.querySelector('.dhero');
+    ok(!!dh, '应渲染深色结论卡 .dhero');
+    ok(dh && dh.classList.contains('rhero'), '保留 rhero 语义类');
+    ok(dh && dh.querySelector('.rh').textContent.length > 0, '应有放大结论标题');
+    ok(dh && dh.querySelectorAll('.dtile').length === 2, '应有两块指标瓦片');
+    ok(dh && dh.querySelector('.q[data-tip]'), '「两个数字区别」应为问号 tooltip');
+    ok(dh && dh.querySelector('.dbar .fill'), '应有能用掉进度条');
+    ok(d.getElementById('k-out').textContent.indexOf('资金机会成本') < 0, '资金机会成本折叠应已删除');
+    ok(d.getElementById('k-out').textContent.indexOf('这两个数字有什么区别？（重要）') < 0, '旧概念区分折叠应已删除');
+    ok(!!d.querySelector('.rangebar'), '应渲染三层区间条');
+    ok(d.querySelectorAll('.rblegend .li').length === 3, '图例应有三条关键词');
+    ok(d.getElementById('k-out').textContent.indexOf('撑到下次大促的最少') >= 0, '图例①文案');
+    ok(!!d.querySelector('.rangebar .pin'), '应有「你：N 套」标记');
+    const det = d.querySelector('details.detail');
+    ok(!!det && det.open, '计算明细应默认展开');
+    const y0 = w.scrollY;
+    d.querySelector('#topnav a[data-sec="sec-about"]').click();
+    setTimeout(() => {
+      w.scrollTo(0, d.getElementById('sec-about').offsetTop - 40);
+      ok(w.scrollY > y0 + 300, 'sec-about 应可通过滚动到达（offsetTop=' + d.getElementById('sec-about').offsetTop + '）');
+      const inp = d.getElementById('k-planSets');
+      inp.value = 4; inp.dispatchEvent(new w.Event('input', { bubbles: true }));
+      ok(d.querySelector('.dhero .rh').textContent.length > 0, '改买几套后深色卡应更新');
+      out.unshift('PASS ' + pass + ' / FAIL ' + fail);
+      document.getElementById('r').textContent = out.join('\n');
+      document.title = 'PROBE DONE';
+    }, 4500);
+  } catch (e) {
+    out.push('ERROR ' + e.message);
+    document.getElementById('r').textContent = out.join('\n');
+    document.title = 'PROBE ERR';
+  }
+}, 3500);
+</script></body></html>

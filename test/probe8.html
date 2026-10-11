@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html><meta charset="utf-8">
+<body style="margin:0">
+<iframe id="f" src="../index.html" style="width:390px;height:900px;border:1px solid #ccc"></iframe>
+<pre id="r">PENDING</pre>
+<script>
+const log = [];
+const ok = (c, m) => log.push((c ? 'PASS ' : 'FAIL ') + m);
+window.onload = () => setTimeout(run, 400);
+function run() {
+  const d = document.getElementById('f').contentDocument;
+  const w = document.getElementById('f').contentWindow;
+  if (!d || !w) { document.getElementById('r').textContent = 'FAIL no iframe doc'; return; }
+  const $ = id => d.getElementById(id);
+
+  // 1. 新布局存在
+  ok(!!d.querySelector('.fslide .fs-top'), 'fslide/fs-top 布局存在');
+  ok(!!d.querySelector('.fs-scale'), '刻度行 fs-scale 存在');
+
+  // 2. planSets 滑块上限 20
+  const rs = d.querySelector('input[type=range][data-num=k-planSets]');
+  ok(rs && rs.max === '20' && rs.value === '2', 'planSets 滑块 min/max=20, 初始 2（实际 max=' + (rs && rs.max) + ' value=' + (rs && rs.value) + '）');
+
+  // 3. 手动输入 25 → 滑块钉在 20，右刻度变「20+套」且带 over 样式
+  const num = $('k-planSets');
+  num.value = '25';
+  num.dispatchEvent(new w.Event('input', { bubbles: true }));
+  ok(rs.value === '20', '输入 25 后滑块钉在 20（实际 ' + rs.value + '）');
+  const lb = d.querySelector('.fslide') && d.querySelector('input[data-num=k-planSets]').closest('.fslide').querySelector('.fs-max');
+  ok(lb && lb.textContent === '20+套', '右刻度变「20+套」（实际 ' + (lb && lb.textContent) + '）');
+  ok(lb && lb.classList.contains('over'), '右刻度加 over 高亮');
+  const outTxt = w.document.getElementById('k-out').textContent;
+  ok(/25\s*套|500\s*份|2,?475/.test(outTxt), '结果区按 25 套计算（片段：' + outTxt.slice(0, 120).replace(/\s+/g, ' ') + '…）');
+
+  // 4. 拖滑块到 5 → 数字框跟随
+  rs.value = '5';
+  rs.dispatchEvent(new w.Event('input', { bubbles: true }));
+  ok(num.value === '5', '滑块拖到 5 → 数字框变 5（实际 ' + num.value + '）');
+  ok(lb.textContent === '20套' && !lb.classList.contains('over'), '回到范围内刻度恢复「20套」');
+
+  // 5. setSize 预填 100 的预设：滑块钉 30、刻度 30+份
+  const presetBtns = [...d.querySelectorAll('[data-preset], .preset-btn, button')].filter(b => /规格不合适/.test(b.textContent));
+  if (presetBtns.length) {
+    presetBtns[0].click();
+    const rsz = d.querySelector('input[type=range][data-num=k-setSize]');
+    ok(rsz && rsz.max === '30' && rsz.value === '30', '规格不合适预设：setSize 滑块钉 30（实际 max=' + (rsz && rsz.max) + ' value=' + (rsz && rsz.value) + '）');
+    const lsz = rsz.closest('.fslide').querySelector('.fs-max');
+    ok(lsz && lsz.textContent === '30+份', 'setSize 右刻度「30+份」（实际 ' + (lsz && lsz.textContent) + '）');
+  } else log.push('SKIP 规格不合适预设按钮未找到');
+
+  document.getElementById('r').textContent = log.join('\n');
+  document.title = log.some(l => l.startsWith('FAIL')) ? 'HASFAIL' : 'ALLPASS';
+}
+</script></body></html>
