@@ -9,8 +9,9 @@ window.onerror = function (m) { out.push('OUTER-ERR ' + m); };
 setTimeout(() => {
   try {
     const w = document.getElementById('f').contentWindow, d = w.document;
-    ['sec-main','sec-cmp','sec-vs','sec-group','sec-about'].forEach(id =>
+    ['sec-main','sec-cmp','sec-group','sec-about'].forEach(id =>
       ok(d.getElementById(id) && d.getElementById(id).offsetHeight > 0, id + ' 应始终可见（锚点单页）'));
+    ok(!d.getElementById('sec-vs'), '独立预售与现货模块应已删除');
     const dh = d.querySelector('.dhero');
     ok(!!dh, '应渲染深色结论卡 .dhero');
     ok(dh && dh.classList.contains('rhero'), '保留 rhero 语义类');
@@ -24,8 +25,8 @@ setTimeout(() => {
     ok(d.querySelectorAll('.rblegend .li').length === 3, '图例应有三条关键词');
     ok(d.getElementById('k-out').textContent.indexOf('撑到下次大促的最少') >= 0, '图例①文案');
     ok(!!d.querySelector('.rangebar .pin'), '应有「你：N 套」标记');
-    const det = d.querySelector('details.detail');
-    ok(!!det && det.open, '计算明细应默认展开');
+    const det = d.querySelector('details.calc-more');
+    ok(!!det && !det.open, '完整计算依据应默认折叠');
     const y0 = w.scrollY;
     d.querySelector('#topnav a[data-sec="sec-about"]').click();
     setTimeout(() => {

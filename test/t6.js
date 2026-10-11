@@ -57,8 +57,8 @@ const patched = script + `
   calcCore, derive, simulate, renderInputs, syncStateFromInputs,
   dayDiff, dayDiffRaw, dateStr, dateToStr, nextSale, bottleLabel, amtRef, fmt, amt,
   resetAll, persist, restore, auditStale, renderStaleBar, DEFAULT_STATE, clone, ASSUMED_SHELF,
-  setVsDirty(d){vsDirty=d;}, setGp(d){gPackDirty=d;}, setGm(d){gMemberDirty=d;},
-  syncGroup, calcGroup, calcVs,
+setGp(d){gPackDirty=d;}, setGm(d){gMemberDirty=d;},
+  syncGroup, calcGroup,
   setEl(id,val){ const e=document.getElementById(id); if(e) e.value=val; },
   getEl(id){ return document.getElementById(id); },
   getStale(){ return document.getElementById('staleBar').innerHTML; },
@@ -101,8 +101,8 @@ console.log('======== 1. 三层结构：不再把「不过期」当成「都合�
   ok(o.indexOf('提前囤货段') >= 0, '应输出第 ② 层（提前囤货段）');
   ok(o.indexOf('效期上限') >= 0, '应输出第 ③ 层（效期上限）');
   ok(raw().indexOf('rhero info') >= 0, '价格未确认时，提前囤货段应为中性提示（info），不能给绿色结论');
-  ok(o.indexOf('多占用') >= 0 && o.indexOf('机会成本') >= 0, '应量化提前囤货占用的资金');
-  ok(o.indexOf('低过约') >= 0, '应给出「需要多大折扣才划算」的门槛');
+  ok(o.indexOf('先比价') >= 0, '价格未知时应提示先比价');
+  ok(o.indexOf('需要价格优势') >= 0, '提前囤货必须提示需要价格优势');
 
   // 上限再大，也要说清是「提前囤多久」
   console.log('  商品 2 年后才过期、一月用一瓶：上限有多大？');
@@ -117,8 +117,8 @@ console.log('======== 1. 三层结构：不再把「不过期」当成「都合�
   ok(L2.rec.planBand === 'ahead', '买 12 套仍应归入「提前囤货段」而非「合理」');
   ok(raw().indexOf('rhero info') < 0 && raw().indexOf('rhero good') < 0,
     '价格不比平时低时，提前囤货段不得给绿/中性好评');
-  ok(o2.indexOf('价格并不更低') >= 0, '应明确指出「没有价格优势时不该多囤」');
-  ok(o2.indexOf('提前囤') >= 0 && o2.indexOf('年化 3%') >= 0, '应说明提前了多久、资金成本多少');
+  ok(o2.indexOf('不比平时便宜') >= 0, '应明确指出当前没有价格优势');
+  ok(o2.indexOf('建议只买') >= 0, '无价格优势时应给出保守数量');
 }
 
 /* ============================================================
@@ -132,14 +132,14 @@ console.log('\n======== 2. 价格优势决定提前囤货段的结论 ========')
   const oLow = out();
   console.log('  [更低] ' + oLow.slice(0, 150));
   ok(Llow.rec.planBand === 'ahead' && raw().indexOf('rhero good') >= 0, '有价格优势 → 提前囤货段可以给好评');
-  ok(oLow.indexOf('有价格优势支持') >= 0, '应写明「有价格优势支持」');
+  ok(oLow.indexOf('可以提前囤') >= 0, '有价格优势时可进入提前囤货段');
 
   const Lsame = setup('count', Object.assign({}, base, { vsNormal: 'same' }));
   const oSame = out();
   console.log('  [差不多] ' + oSame.slice(0, 150));
   ok(raw().indexOf('rhero warn') >= 0, '价格差不多 → 应转为劝阻（warn）');
   ok(oSame.indexOf('涨') < 0, '');
-  ok(oSame.indexOf('并不更低') >= 0, '应说明这次并不比平时便宜');
+  ok(oSame.indexOf('不比平时便宜') >= 0, '应说明这次不比平时便宜');
 
   // 恰好买在下限 → 保守绿
   const Ljust = setup('count', Object.assign({}, base, { planSets: 1, vsNormal: 'unknown' }));
@@ -192,7 +192,7 @@ console.log('\n======== 4. 到货晚于大促 → 本单解决不了大促前的
   console.log('  kind=' + L.rec.kind + ' → ' + o.slice(0, 220));
   ok(L.rec.kind === 'late', '到货（200 天）晚于大促（120 天）应判 late，实际 ' + L.rec.kind);
   ok(o.indexOf('赶不上大促') >= 0, '应直说这一单赶不上大促');
-  ok(o.indexOf('解决不了大促前的缺口') >= 0, '应直说本单解决不了大促前的缺口');
+  ok(o.indexOf('只能为下一轮补货') >= 0, '应说明这批货只能用于下一轮补货');
   ok(o.indexOf('撑到大促 3 套') < 0 && o.indexOf('提前囤货 4 ~') < 0, 'late 时不得再给出「买这些就够撑到大促」的区间');
   ok(o.indexOf('断档') >= 0, '应给出断档天数');
 
@@ -213,14 +213,14 @@ console.log('\n======== 5. 效期未知：只给估算，不给「保证不过�
   const o = out();
   console.log('  ' + o.slice(0, 220));
   ok(L.rec.kind === 'fit' || L.rec.kind === 'limited' || L.rec.kind === 'unfit', '未知效期也应给出结论，实际 ' + L.rec.kind);
-  ok(o.indexOf('按假设效期') >= 0, '未知效期时必须标注为「按假设效期估算」');
+  ok(o.indexOf('按假设有效期') >= 0, '未知有效期时必须标注为「按假设有效期估算」');
   ok(o.indexOf('没有过期浪费') < 0, '未知效期时不得断言「没有过期浪费」');
   ok(o.indexOf('以收到货的包装为准') >= 0, '应提示以实际收到批次为准');
 
   // 已知效期时恢复正常断言
   const L2 = setup('count', { gap: 3, perUse: 1, stock: 6, oldExp: A.dateStr(150), setSize: 20, setPrice: 99,
     planSets: 1, oldBatches: [], vsNormal: 'unknown', expKnown: true, newExp: A.dateStr(540), arrive: TODAY(), sale: A.dateToStr(A.nextSale()) });
-  ok(out().indexOf('按假设效期') < 0, '已知效期时不应出现「按假设效期」');
+  ok(out().indexOf('按假设有效期') < 0, '已知效期时不应出现「按假设效期」');
 }
 
 /* ============================================================
@@ -245,7 +245,7 @@ console.log('\n======== 6. 多批旧货 ========');
   ok(near(two.stockAmount, 20, 1e-6), '多批库存应相加 = 20，实际 ' + two.stockAmount);
   ok(near(two.rec.oldStandaloneWaste, 2, 1e-6), '3 天后到期的 5 片只能吃掉 3 片，剩 2 片浪费，实际 ' +
     two.rec.oldStandaloneWaste.toFixed(2));
-  ok(out().indexOf('分 2 批') >= 0, '明细应说明旧货分了几批');
+  ok(A.state.count.oldBatches.length === 2, '应保留两批旧货的独立记录');
 }
 
 /* ============================================================

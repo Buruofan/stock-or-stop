@@ -44,6 +44,7 @@ global.localStorage = {
   removeItem: k => { delete store[k]; },
 };
 global.window = global;
+global.IntersectionObserver = class { constructor(){} observe(){} unobserve(){} disconnect(){} };
 global.addEventListener = () => {};
 global.removeEventListener = () => {};
 
@@ -56,8 +57,8 @@ const patched = script + `
   calcCore, derive, simulate, renderInputs, syncStateFromInputs,
   dayDiff, dateStr, dateToStr, nextSale, bottleLabel, amtRef, fmt, amt,
   resetAll, persist, restore, DEFAULT_STATE, clone,
-  setVsDirty(d){vsDirty=d;}, setGp(d){gPackDirty=d;}, setGm(d){gMemberDirty=d;},
-  syncGroup, calcGroup, calcVs,
+setGp(d){gPackDirty=d;}, setGm(d){gMemberDirty=d;},
+  syncGroup, calcGroup,
   setEl(id,val){ const e=document.getElementById(id); if(e) e.value=val; },
   getEl(id){ return document.getElementById(id); },
 };`;
@@ -102,9 +103,9 @@ console.log('======== 1. 推荐整套却会过期 → 必须报「规格不合�
   console.log('  场景B: kind=' + L2.rec.kind + ' 推荐=' + L2.rec.recQty + ' 每套=' + L2.setAmount +
     ' 上限套数=' + L2.rec.maxSetsNoWaste + ' 下限套数=' + L2.rec.minSetsNeeded);
   ok(L2.rec.kind === 'limited', '效期受限场景应为 limited，实际 ' + L2.rec.kind);
-  ok(L2.rec.recQty === L2.rec.maxSetsNoWaste * L2.setAmount, 'limited 的推荐量应等于上限套数 × 每套量');
-  ok(L2.rec.recQty <= L2.rec.maxNoWaste + 1e-6, 'limited 的推荐量不得越过不浪费上限');
-  ok(out().indexOf('最多建议买到') >= 0, 'limited 应写成「最多建议买到」');
+  ok(L2.rec.hiSets === L2.rec.maxSetsNoWaste, 'limited 的效期上限应等于不浪费套数');
+  ok(L2.rec.hiSets * L2.setAmount <= L2.rec.maxNoWaste + 1e-6, 'limited 的效期上限不得越过不浪费量');
+  ok(out().indexOf('最多') >= 0 && out().indexOf('不浪费') >= 0, 'limited 应说明最多买几套不浪费');
   console.log('  ' + out().slice(0, 190));
 
   // 反例：规格合适时不能误判 unfit
@@ -145,18 +146,6 @@ console.log('\n======== 3. 到货时间：未到货的货不能提前消耗 ====
   ok(near(sim.remainingAt(10), 4 - 10 / 30, 1e-6), '第 10 天还剩 ' + (4 - 10 / 30).toFixed(3) + '，实际 ' + sim.remainingAt(10).toFixed(3));
   ok(near(sim.remainingAt(75), 2, 1e-6), '第 75 天（新货刚到）应还剩 2 件，实际 ' + sim.remainingAt(75).toFixed(3));
 
-  // 现货 vs 预售：预售等 75 天、且新货效期短 → 必须报断档
-  const patch = { perPack: 30, stock: 2, oldExp: A.dateStr(100), setSize: 2, setPrice: 60,
-    planSets: 1, newExp: A.dateStr(400), arrive: A.dateToStr(new Date()), sale: A.dateStr(200) };
-  setup('pack', patch);
-  A.setVsDirty({ a: true, b: true });
-  A.setEl('v-a-price', 60); A.setEl('v-a-amount', 2); A.setEl('v-a-gift', 0); A.setEl('v-a-wait', 0); A.setEl('v-a-shelf', 400);
-  A.setEl('v-b-price', 54); A.setEl('v-b-amount', 2); A.setEl('v-b-gift', 0); A.setEl('v-b-wait', 75); A.setEl('v-b-shelf', 10);
-  A.calcVs();
-  const vs = strip(A.getEl('v-out').innerHTML);
-  console.log('  ' + vs.slice(0, 180));
-  ok(vs.indexOf('断档 15 天') >= 0, '预售（等 75 天、旧货 60 天用完）应报「断档 15 天」');
-
   // 主流程：预计到货日应真的延后消耗
   const p4 = { gap: 1, perUse: 1, stock: 30, oldExp: A.dateStr(40), setSize: 60, setPrice: 199,
     planSets: 1, newExp: A.dateStr(300), arrive: A.dateStr(20), sale: A.dateStr(120) };
@@ -176,12 +165,12 @@ console.log('\n======== 4. 赠品：实物量 / 会不会用 / 值多少钱 三�
   let dv = A.derive();
   console.log('  merge=true → setAmount=' + dv.setAmount + ' (500 + 100*50%)  净价=' + dv.setPrice);
   ok(near(dv.setAmount, 550, 1e-6), '可消耗量 = 正装 500 + 赠品可用 50 = 550，实际 ' + dv.setAmount);
-  ok(near(dv.setPrice, 360, 1e-6), '净价 = 400 − 40 = 360，实际 ' + dv.setPrice);
-  ok(near(dv.giftRecv, 100, 1e-6) && near(dv.giftUse, 50, 1e-6), '应保留「实收 100 / 会用 50」两个概念');
+  ok(near(dv.setPrice, 400, 1e-6), '同款赠品不应重复抵价，实际 ' + dv.setPrice);
+  ok(near(dv.giftRecv, 100, 1e-6) && near(dv.giftUsed, 50, 1e-6), '应保留「实收 100 / 会用 50」两个概念');
   A.calcCore();
   const h1 = A.getEl('k-out').innerHTML;
-  ok(h1.indexOf('赠品可用') >= 0 && h1.indexOf('实收 100') >= 0, '明细应同时写「赠品可用」与「实收」');
-  ok(h1.indexOf('赠品估值') >= 0, '明细应说明赠品估值只影响成本');
+  ok(h1.indexOf('每套') >= 0, '明细应保留套装口径');
+  ok(h1.indexOf('实际付款') >= 0 || h1.indexOf('¥400') >= 0, '明细应保留实际付款');
 
   // 不同产品 → 赠品体积不并入
   Object.assign(A.state.volume, { giftMerge: false });
@@ -199,10 +188,10 @@ console.log('\n======== 5. 语气：给区间与取舍，不给「一定该买�
   const o = out();
   console.log('  kind=' + L.rec.kind + ' → ' + o.slice(0, 170));
   ok(L.rec.kind === 'fit', '默认面膜场景应为 fit，实际 ' + L.rec.kind);
-  ok(o.indexOf('合理购买区间') >= 0, '应给出合理购买区间');
+  ok(o.indexOf('合理购买区间') < 0, '不应使用笼统的「合理购买区间」');
   ok(o.indexOf('刚好合适') < 0, '不应再用「刚好合适」这种确定语气');
   ok(o.indexOf('建议购买：') < 0, '不应再用「建议购买：X 套」这种单点断语');
-  ok(o.indexOf('买多少由你判断') >= 0 || o.indexOf('靠上限') >= 0, '应说明取舍由用户决定');
+  ok(o.indexOf('提前囤货段') >= 0, '应展示可由用户权衡的提前囤货段');
 }
 
 console.log('\n======== 6. 本机保存 / 恢复 ========');

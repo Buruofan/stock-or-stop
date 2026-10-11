@@ -56,7 +56,7 @@ const patched = script + `
   dayDiff, dateStr, dateToStr, nextSale, bottleLabel, fmt, amt, sceneUnit,
   resetAll, persist, restore, DEFAULT_STATE, clone,
   stockFieldHtml, oldBatchUI, FS, T, bindRanges,
-  setOffers(o){ offers = o; }, get offers(){ return offers; }, renderOffers, calcVs, resetCompare,
+  setOffers(o){ offers = o; }, get offers(){ return offers; }, renderOffers, resetCompare,
   getEl(id){ return document.getElementById(id); },
 };`;
 eval(patched);
@@ -264,8 +264,8 @@ console.log('\n======== 5. 滚轮与问号提示 ========');
   ['直播间 / 整箱货常常看不到批次', '多买（提前囤货）划不划算，取决于这一项', '只填一个最早到期日，会把整批库存当成同一天到期']
     .forEach(t => ok(visible.indexOf(t) < 0, '不该继续平铺长说明：「' + t + '」'));
   // 但它们应该还找得到（收进 tooltip）
-  ok(tips.some(t => t.indexOf('看不到批次') >= 0), '「看不到批次」的说明应保留在问号里');
-  ok(tips.some(t => t.indexOf('取决于这一项') >= 0), '「价格对比」的说明应保留在问号里');
+  ok(tips.some(t => t.indexOf('不确定到期日') >= 0), '到期日估算说明应保留在问号里');
+  ok(tips.some(t => t.indexOf('价格优势') >= 0), '价格对比说明应保留在问号里');
   ok(tips.some(t => t.indexOf('同一天到期') >= 0), '「多批旧货」的说明应保留在问号里');
 
   // 静态 HTML 里的问号（三个辅助页的说明；其余解释性内容移到了「计算方法」独立页）
@@ -284,9 +284,9 @@ console.log('\n======== 5. 滚轮与问号提示 ========');
 }
 
 /* ============================================================
-   5.5 口径统一：比价 / 预售与主流程同一模拟器（多批旧货 + 先到期先用 + 到货时间）
+   5.5 口径统一：比价与主流程同一模拟器（多批旧货 + 先到期先用 + 到货时间）
 ============================================================ */
-console.log('\n======== 5.5 比价/预售口径统一 ========');
+console.log('\n======== 5.5 比价口径统一 ========');
 {
   // LAST 快照应携带真实旧货批次
   setup('count', Object.assign({}, BASE_COUNT, { gap: 1, perUse: 1, stock: 200, oldExp: A.dateStr(400) }));
@@ -312,18 +312,7 @@ console.log('\n======== 5.5 比价/预售口径统一 ========');
   ok(h.indexOf('浪费 12 份') >= 0, '多批旧货 + shelf=8：候选只能用掉 8 份、浪费 12 份（旧算法会判 usable=0），实际：' + (h.match(/浪费[^<]*/g) || []).join('|'));
   ok(A.getEl('cmp-sync').innerHTML.indexOf('先到期先用') >= 0, '比价说明应写明「先到期先用」口径');
 
-  // C. 预售：旧货按真实到期日（30 天后到期≠100 天后才用完）
-  Object.assign(s, BASE_COUNT, { gap: 1, perUse: 1, stock: 100, oldExp: A.dateStr(30), planSets: 1 });
-  s.useBatches = false; s.oldBatches = [];
-  A.renderInputs(); A.calcCore();
-  A.getEl('v-a-price').value = '100'; A.getEl('v-a-amount').value = '150';
-  A.getEl('v-a-gift').value = '0'; A.getEl('v-a-wait').value = '0'; A.getEl('v-a-shelf').value = '50';
-  A.getEl('v-b-price').value = '90'; A.getEl('v-b-amount').value = '150';
-  A.getEl('v-b-gift').value = '0'; A.getEl('v-b-wait').value = '10'; A.getEl('v-b-shelf').value = '50';
-  A.calcVs();
-  const vout = strip(A.getEl('v-out').innerHTML);
-  ok(vout.indexOf('浪费 130 份') >= 0, '现货：旧货只活 30 天 → 新货 50 天效期只吃得到 20 份、浪费 130 份（旧算法错算 100 份），实际：' + vout);
-  ok(A.getEl('vs-sync').innerHTML.indexOf('真实到期日') >= 0, '预售说明应写明旧货按真实到期日');
+
 }
 
 

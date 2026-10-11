@@ -19,7 +19,7 @@
   *{box-sizing:border-box; margin:0; padding:0;}
   body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); line-height:1.55;}
   .wrap{max-width:1200px; margin:0 auto; padding:0 20px;}
-  .page-lean{max-width:900px; margin:0 auto;}
+  .page-lean{max-width:1200px; margin:0 auto;}
 
   /* ---- 首屏 Hero：整幅浅色背景拉通，居中大标题 ---- */
   .hero{background:linear-gradient(180deg,#e3e9f4 0%,#eef1f6 100%); text-align:center; padding:64px 20px 58px;}
@@ -51,12 +51,16 @@
   .sec-head{padding:0 2px 14px;}
   .sec-head h1{font-size:21px; font-weight:800;}
   .sec-head p{font-size:12.5px; color:var(--faint); margin-top:3px;}
-  .split{display:grid; gap:20px; align-items:start;}
+  .split{display:grid; gap:20px; align-items:stretch;}
+  .col-inputs{display:flex; flex-direction:column; min-width:0;}
+  .col-inputs>.card{flex:1; margin-bottom:0;}
+  .col-result{min-width:0;}
   @media (min-width:1020px){
     .split{grid-template-columns:minmax(0,1fr) 420px;}
     .col-result{position:sticky; top:66px; max-height:calc(100vh - 82px); overflow-y:auto; scrollbar-width:thin;}
   }
   .col-result .card{margin-bottom:14px;}
+  .col-inputs .unit,.col-inputs .rate-note,.col-inputs .fs-scale,.col-inputs .unit b,.col-inputs .rate-note b{font-weight:400;}
 
   .card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:16px;}
   .card h2{font-size:16px; font-weight:700; margin-bottom:4px;}
@@ -72,10 +76,46 @@
   .modes button.active{border-color:var(--accent); background:var(--accent-soft);}
   .modes button.active b{color:var(--accent);}
 
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(158px,1fr)); gap:11px 14px;}
+  .grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px 16px; align-items:stretch;}
+  .grid[data-mode="pack"]{grid-template-columns:repeat(4,minmax(0,1fr));}
+  .grid[data-mode="count"] .fslide:has(#k-perUse){grid-column:span 2;}
+  .grid[data-mode="count"] .stock-field{grid-column:span 1;}
+  .grid[data-mode="pack"] .stock-field{grid-column:span 2;}
+  .grid .fslide:has(#k-setSize),.grid .fslide:has(#k-planSets),.grid .field:has(#k-setPrice),.grid .field:has(#k-vsNormal){grid-column:span 2;}
+  .grid[data-mode="pack"] .fslide:has(#k-perPack){grid-column:span 2;}
+  .grid[data-mode="volume"] .rate-choice,.grid[data-mode="volume"] .field:has(#k-bottleMl),.grid[data-mode="volume"] .fslide:has(#k-bottleDays),.grid[data-mode="volume"] .fslide:has(#k-daily){grid-column:span 2;}
+  .grid[data-mode="volume"][data-rate="daily"] .rate-choice{grid-column:span 2;}
+  .grid[data-mode="volume"][data-rate="daily"] .rate-note{grid-column:1/-1; margin-top:-10px;}
+  .grid[data-mode="volume"] .stock-field{grid-column:span 2;}
+  .grid[data-mode="volume"] .rate-note{grid-column:1/-1; margin-top:-12px;}
+  .grid[data-mode="volume"] .field:has(#k-vsNormal){grid-column:1/-1;}
+  .grid .field:has(#k-sale){grid-column:span 2;}
+  .volume-fields{grid-column:1/-1; min-width:0;}
+  .volume-fields .sub-grid:first-child{margin-top:0;}
+  .segmented{display:flex; width:100%; border:1px solid #dce2ea; border-radius:9px; padding:3px; background:#f5f7fa; gap:3px; min-height:36px;}
+  .segmented button{flex:1; min-width:0; border:0; background:transparent; border-radius:6px; color:#627084; font:600 12px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; cursor:pointer; padding:5px 4px; white-space:nowrap;}
+  .segmented button[aria-pressed="true"]{background:#fff; color:var(--accent); box-shadow:0 1px 4px rgba(28,35,48,.12);}
+  .segmented button:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+  .visually-hidden{position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important;}
+  .grid .price-context{display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start;}
+  .grid .price-context label{margin:0 0 8px; min-width:0;}
+
+
+  .grid[data-mode="volume"] #k-rateMode{max-width:none!important;}
+  .grid .field{min-width:0;}
+  .grid .field input,.grid .field select{height:36px; min-height:36px;}
+  .grid .grp-head{margin-top:10px; padding:19px 0 2px; border-top:1px solid var(--border); font-size:16px; font-weight:800; color:var(--text); line-height:1.35;}
+  .grid .grp-head:first-child{margin-top:0; padding-top:0; border:0;}
+  .grid .field label{min-height:24px; line-height:1.35; display:flex; align-items:center; gap:3px; font-size:13px; font-weight:600; color:#4f5b6d;}
+  .grid .field label .q{align-self:center;}
+  .grid .field .unit{line-height:1.4;}
+  .grid .fslide .fs-top{display:grid; grid-template-columns:minmax(0,1fr) 78px; min-height:36px; align-items:center; gap:10px;}
+  .grid .fslide .fs-top input[type=number]{width:78px; height:36px; min-height:36px; padding:4px 7px; font-size:13.5px; font-weight:600;}
+  .grid .fslide .fs-top label{min-height:0; display:block; margin:0; align-self:center;}
+  .grid .rate-note{grid-column:1/-1; margin-top:-12px; color:var(--muted); font-size:12px;}
   .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:4px;}
   .field label .req{color:var(--accent);}
-  .field input,.field select{width:100%; padding:8px 10px; font-size:14px; font-family:inherit; border:1px solid var(--border); border-radius:9px; background:#fbfcfd; color:var(--text);}
+  .field input,.field select{width:100%; padding:5px 9px; font-size:13.5px; font-weight:500; font-family:inherit; border:1px solid #dce2ea; border-radius:8px; background:#fff; color:#354052;}
   .field input:focus,.field select:focus{outline:none; border-color:var(--accent); background:#fff;}
   .field .unit{font-size:11.5px; color:var(--faint); margin-top:3px;}
   .pair{display:flex; gap:6px;}
@@ -84,23 +124,82 @@
   .sub-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px 14px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border);}
   .sub-grid .head{grid-column:1/-1; font-size:12px; color:var(--muted); font-weight:600;}
   .sub-grid .spec-row{grid-column:1/-1;}
+  .group-pack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;padding-top:16px;border-top:1px solid var(--border);align-items:start;}
+  .group-pack-title{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px;}
+  .group-specs #g-items{display:grid;gap:10px;margin-bottom:10px;}
+  .group-specs .spec-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 26px;gap:10px;align-items:start;}
+  .group-specs .field{min-width:0;}
+  .group-specs .field label{min-height:18px;white-space:nowrap;}
+  .group-specs .del{align-self:start;margin-top:20px;height:34px;}
+  .group-specs .group-qty .fs-top{grid-template-columns:minmax(0,1fr) 72px;}
+  .group-specs .group-qty .fs-top input[type=number]{width:72px;}
+  .group-pack-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;align-items:start;gap:10px 16px;}
+  .group-pack-side .group-pack-title{grid-column:1/-1;margin-bottom:2px;}
+  .group-total{display:grid;gap:5px;padding-bottom:3px;}
+  .group-total span{font-size:12px;color:var(--muted);}
+  .group-total strong{font-size:18px;line-height:1.35;font-weight:700;color:var(--text);}
+  .group-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px;}
+  .group-metric{border:1px solid var(--border);border-radius:10px;padding:12px 14px;min-width:0;}
+  .group-metric span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:5px;}
+  .group-metric strong{font-size:15px;color:var(--text);font-weight:650;overflow-wrap:anywhere;}
+  .group-note{margin-top:12px;font-size:12px;color:var(--muted);background:#f6f7f9;border-radius:9px;padding:10px 12px;}
+  #sec-about .page-lean{max-width:1200px;}
+  .method-card{margin:0;}
+  .method-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 26px;}
+  .method-card h2{font-size:15px;margin:24px 0 8px;}
+  .method-card h2:first-child{margin-top:0;}
+  .method-row{padding:13px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;}
+  .method-row span{display:block;color:var(--text);font-weight:600;margin-bottom:3px;}
+  .method-row p{color:var(--muted);font-weight:400;margin:0;}
+  .method-card .desc{line-height:1.6;}
+  @media(max-width:700px){.group-pack{grid-template-columns:1fr;}.group-pack-side{grid-template-columns:repeat(2,minmax(0,1fr));}.group-metrics{grid-template-columns:1fr;}.method-list{grid-template-columns:1fr;}}
+  .group-table{table-layout:fixed;}
+  .group-table th:not(:last-child),.group-table td:not(:last-child){width:24%;}
+  .group-table th:last-child,.group-table td:last-child{width:4%;text-align:center;}
+  .group-table .del{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;margin:0;padding:0;vertical-align:middle;}
+  .sub-grid.gift-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .gift-grid .field label{min-height:24px;}
+  .gift-grid #volTotal{color:var(--muted);font-weight:500;}
+  @media(max-width:520px){.sub-grid.gift-grid{grid-template-columns:1fr;}}
   .spec-row{display:flex; gap:8px; align-items:flex-start;}
-  .grid .grp-head{grid-column:1/-1; font-size:12px; font-weight:700; color:var(--muted); padding-top:2px;}
+  .grid .grp-head{grid-column:1/-1;}
   .grid .grp-head span{font-weight:400; color:var(--faint); font-size:11.5px;}
   .grid > details{grid-column:1/-1;}
-  details.adv{margin-top:2px; background:transparent; border:none;}
+  details.adv{margin-top:4px; background:transparent; border:none;}
+  details.adv summary{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 13px; border:1px solid var(--border); border-radius:9px; background:#f8fafc; color:#536174; font-size:12.5px; font-weight:650;}
+  details.adv summary:hover{border-color:#cbd4df; background:#f3f6fa;}
+  details.adv summary::before{content:none;}
+  details.adv summary::after{content:'展开设置 ↓'; color:var(--accent); font-size:11.5px; font-weight:700; white-space:nowrap;}
+  details.adv[open] summary::after{content:'收起设置 ↑';}
+  details.adv[open] summary{border-color:#e9c3aa; background:#fff8f2;}
   details.adv .adv-body{display:grid; grid-template-columns:repeat(auto-fill,minmax(158px,1fr)); gap:11px 14px; padding:6px 0 10px;}
-  .presetbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 16px;}
-  .presetbar .tip{font-size:12px; color:var(--faint); font-weight:600;}
+  .preset-dialog{position:fixed; inset:0; margin:auto; width:min(640px,calc(100vw - 32px)); max-height:min(80vh,760px); padding:24px; border:1px solid var(--border); border-radius:18px; box-shadow:0 24px 70px rgba(20,31,58,.22); color:var(--text);}
+  .preset-dialog::backdrop{background:rgba(20,31,58,.48);}
+  .preset-dialog-head{display:flex; align-items:start; justify-content:space-between; gap:18px;}
+  .preset-dialog-head h2{font-size:20px;}
+  .preset-dialog-head p{font-size:13px; color:var(--muted); margin-top:3px;}
+  .preset-close{border:0; background:#f2f4f7; border-radius:9px; font-size:23px; width:32px; height:32px; line-height:1; cursor:pointer; color:var(--muted);}
+  .preset-scenes{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:20px 0 14px;}
+  .preset-scenes button{border:1px solid var(--border); background:#fff; border-radius:10px; padding:9px 4px; color:var(--muted); font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;}
+  .preset-scenes button.active{border-color:var(--accent); color:var(--accent); background:var(--accent-soft);}
+  .preset-list{display:grid; gap:8px;}
+  .preset-list button{display:flex; justify-content:space-between; align-items:center; gap:14px; width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:11px; background:#fff; text-align:left; font-family:inherit; font-size:13px; font-weight:600; color:var(--text); cursor:pointer;}
+  .preset-list button:hover{border-color:var(--accent); background:#fffaf6;}
+  .preset-list button::after{content:'→'; color:var(--accent); font-size:17px;}
   .spec-row .field{flex:1; min-width:0;}
 
   /* ---- 深色重点结论卡：白字大标题，只放关键词与可视化 ---- */
-  .dhero{background:linear-gradient(160deg,var(--dark),var(--dark2)); border-radius:16px; padding:20px 20px 18px; color:#fff; box-shadow:0 10px 30px rgba(20,31,58,.28);}
+  .dhero{margin-bottom:0; background:linear-gradient(160deg,var(--dark),var(--dark2)); border-radius:16px 16px 0 0; padding:20px 20px 18px; color:#fff;}
+  .dhero + .range-card{border-top:0;border-radius:0 0 var(--radius) var(--radius);}
   .dhero .dtop{display:flex; align-items:center; justify-content:space-between; gap:8px;}
   .dhero .rk{font-size:11px; font-weight:700; letter-spacing:2px; color:rgba(255,255,255,.55);}
   .dhero .rh{font-size:26px; font-weight:800; line-height:1.3; margin-top:8px;}
   .dhero .rs{font-size:13px; color:rgba(255,255,255,.72); margin-top:6px;}
   .dhero .rs b{color:#fff;}
+  .dcost{display:flex; justify-content:space-between; align-items:baseline; gap:8px; border-top:1px solid rgba(255,255,255,.18); margin-top:14px; padding-top:12px;}
+  .dcost .label{font-size:12px; color:rgba(255,255,255,.7);}
+  .dcost .value{font-size:22px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums;}
+  .dcost .base{font-size:11px; color:rgba(255,255,255,.55); margin-left:5px;}
   .dtiles{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;}
   .dtile{background:rgba(255,255,255,.09); border-radius:11px; padding:11px 13px;}
   .dtile .k{font-size:11.5px; color:rgba(255,255,255,.6); margin-bottom:3px;}
@@ -120,10 +219,12 @@
 
   /* ---- 买几套：三层区间条可视化 ---- */
   .rangebar-wrap{padding:2px 0 0;}
-  .rangebar{position:relative; height:16px; border-radius:8px; background:#eef0f4; display:flex; overflow:visible; margin:26px 0 4px;}
+  .rangebar{position:relative; height:16px; margin:26px 0 4px;}
+  .rangebar .zones{display:flex;width:100%;height:100%;overflow:hidden;border-radius:8px;background:#eef0f4;}
   .rangebar .rz{height:100%; position:relative;}
-  .rangebar .rz:first-child{border-radius:8px 0 0 8px;}
-  .rangebar .rz:last-child{border-radius:0 8px 8px 0;}
+  .rangebar .rz:first-of-type{border-radius:8px 0 0 8px;}
+  .rangebar .rz:last-of-type{border-radius:0 8px 8px 0;overflow:hidden;}
+  .rangebar .rz:only-of-type{border-radius:8px;}
   .rangebar .rz.g{background:linear-gradient(180deg,#37c08e,#0f9d6e);}
   .rangebar .rz.o{background:repeating-linear-gradient(135deg,#ffb26b 0 6px,#ff9a4d 6px 12px);}
   .rangebar .rz.r{background:linear-gradient(180deg,#e0566e,#c93b54);}
@@ -163,13 +264,12 @@
      background:#eef0f3; color:var(--muted); font-size:10.5px; font-weight:700; cursor:pointer; user-select:none;
      vertical-align:1px; margin-left:4px; flex:0 0 auto; line-height:1;}
   .q:hover,.q:focus{background:var(--accent-soft); color:var(--accent); outline:none;}
-  #tip{position:fixed; z-index:9999; max-width:min(300px,92vw); background:#1c2330; color:#fff; font-size:12px;
-       line-height:1.55; padding:9px 11px; border-radius:9px; box-shadow:0 8px 24px rgba(0,0,0,.24); font-weight:400;}
-  #tip b{color:#ffd3b0; font-weight:700;}
+  #tip{position:fixed; z-index:9999; width:max-content; max-width:min(280px,calc(100vw - 16px)); background:#1c2330; color:#fff; font-size:12px;
+       line-height:1.55; padding:9px 11px; border-radius:9px; box-shadow:0 8px 24px rgba(0,0,0,.24); font-weight:400; white-space:pre-line; overflow-wrap:anywhere;}
   #tip[hidden]{display:none;}
 
   /* 滑块字段：上=指标名+数字框，中=全宽滑块，下=min/max 刻度 */
-  .fslide .fs-top{display:flex; align-items:center; justify-content:space-between; gap:9px; margin-bottom:3px;}
+  .fslide .fs-top{display:flex; align-items:center; justify-content:space-between; gap:9px; margin-bottom:7px;}
   .fslide .fs-top label{margin-bottom:0;}
   .fslide .fs-top input[type=number]{flex:0 0 76px; padding:5px 4px; font-size:13.5px; text-align:center;}
   .fslide input[type=range]{display:block; width:100%; -webkit-appearance:none; appearance:none; height:20px; padding:0; border:none; background:transparent; margin:0;}
@@ -178,7 +278,7 @@
        background:var(--accent); border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.22); cursor:grab;}
   .fslide input[type=range]::-moz-range-track{height:5px; border-radius:3px; background:#e6e8ec;}
   .fslide input[type=range]::-moz-range-thumb{width:15px; height:15px; border:2px solid #fff; border-radius:50%; background:var(--accent);}
-  .fslide .fs-scale{display:flex; justify-content:space-between; gap:8px; font-size:10.5px; color:var(--faint); margin-top:1px; font-variant-numeric:tabular-nums;}
+  .fslide .fs-scale{display:flex; justify-content:space-between; gap:8px; font-size:10.5px; color:var(--faint); margin-top:-3px; font-variant-numeric:tabular-nums;}
   .fslide .fs-scale .fs-max.over{color:var(--accent); font-weight:700;}
   .ro{padding:8px 10px; font-size:14px; font-weight:700; border-radius:9px; background:#f0f2f5; color:var(--text); font-variant-numeric:tabular-nums;}
   .ro .sub{display:block; font-size:11.5px; font-weight:400; color:var(--muted); margin-top:2px;}
@@ -195,6 +295,27 @@
   .detail .kv b.num{color:#8a92a0; font-weight:600;}
   .detail .expl{margin-top:10px; line-height:1.65;}
   .detail .expl b{color:#8a92a0;}
+
+  .calc-card{padding:20px;}
+  .calc-heading{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px;}
+  .calc-heading h2{font-size:15px; margin:0;}
+  .calc-heading span{font-size:11px; color:var(--faint); white-space:nowrap;}
+  .calc-steps{display:grid; grid-template-columns:1fr 1fr; gap:14px 10px;}
+  .calc-step{display:flex; gap:9px; min-width:0; align-items:flex-start;}
+  .step-no{flex:0 0 20px; height:20px; display:grid; place-items:center; border-radius:50%; background:#eef1f5; color:var(--muted); font-size:11px; font-weight:700;}
+  .calc-step strong{display:block; font-size:12px; line-height:1.4;}
+  .calc-step p{font-size:12px; line-height:1.5; color:var(--muted); margin-top:2px; overflow-wrap:anywhere;}
+  .calc-cost{display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; border-top:1px solid var(--border); margin-top:16px; padding-top:14px; font-size:12px; color:var(--muted);}
+  .calc-cost strong{font-size:21px; color:var(--text); font-variant-numeric:tabular-nums;}
+  .calc-cost small{font-size:11px; color:var(--faint);}
+  .calc-more{margin-top:12px; border-top:1px solid var(--border);}
+  .calc-more summary{padding-top:12px; color:var(--muted);}
+  .calc-facts{display:grid; gap:0;}
+  .calc-facts>div{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:8px 0; border-bottom:1px solid #f0f2f5; font-size:12px;}
+  .calc-facts span{color:var(--muted); min-width:0;}
+  .calc-facts b{text-align:right; color:#677386; font-weight:500; min-width:0; overflow-wrap:anywhere;}
+  .calc-rule{font-size:12px; line-height:1.65; color:var(--muted); margin-top:12px;}
+  @media(max-width:520px){.calc-steps{grid-template-columns:1fr;}.calc-heading{display:block;}.calc-heading span{display:block; margin-top:3px;}}
 
   .box{margin-top:14px; font-size:13px;}   /* 扁平化：不再有底色框，杜绝框嵌框 */
 
@@ -235,8 +356,10 @@
   .opt-card.dirty{border-color:var(--text); background:#fafafa;}
   .syncbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; font-size:12px; color:var(--faint);}
   footer{padding:10px 0 44px; font-size:11.5px; color:var(--faint); text-align:center;}
+  @media (max-width:1020px){.col-inputs>.card{margin-bottom:16px;}}
+  @media (max-width:720px){.grid,.grid[data-mode="pack"]{grid-template-columns:repeat(2,minmax(0,1fr));}.grid .field.rate-choice,.grid[data-mode="volume"] .stock-field,.grid[data-mode="volume"] .rate-note{grid-column:1/-1;}}
   @media (max-width:620px){ .dtiles{grid-template-columns:1fr;} .opt-grid{grid-template-columns:1fr;} .topbar .acts{display:none;} .hero .hbtns{flex-direction:column; align-items:center;} }
-  @media (max-width:520px){ .modes{grid-template-columns:1fr;} }
+  @media (max-width:520px){ .modes{grid-template-columns:1fr;} .grid>.field{grid-column:1/-1!important;} .grid,.grid[data-mode="pack"]{grid-template-columns:1fr;} .grid .field label{min-height:0;} .grid .field:has(#k-sale),.grid .fslide:has(#k-setSize),.grid .fslide:has(#k-planSets),.grid .field:has(#k-setPrice),.grid .field:has(#k-vsNormal),.grid[data-mode="count"] .fslide:has(#k-perUse){grid-column:1/-1;} .grid[data-mode="count"] .stock-field,.grid[data-mode="pack"] .stock-field,.grid[data-mode="volume"] .stock-field,.grid[data-mode="pack"] .fslide:has(#k-perPack){grid-column:1/-1;} .grid .fslide .fs-top{min-height:0;} }
 </style>
 </head>
 <body>
@@ -259,11 +382,10 @@
     <nav class="topnav" id="topnav">
       <a href="#sec-main" data-sec="sec-main" class="active">主流程</a>
       <a href="#sec-cmp" data-sec="sec-cmp">套装比价</a>
-      <a href="#sec-vs" data-sec="sec-vs">预售 vs 现货</a>
       <a href="#sec-group" data-sec="sec-group">拼单分摊</a>
       <a href="#sec-about" data-sec="sec-about">计算方法</a>
     </nav>
-    <span class="acts"><button class="btn ghost sm" onclick="resetAll()">↺ 清空重填</button></span>
+    <span class="acts"><button class="btn primary sm" onclick="resetAll()">↺ 清空重填</button></span>
   </div>
 </header>
 
@@ -271,12 +393,12 @@
 <div class="hero" id="hero">
   <div class="hpill">免费 · 无需注册 · 数据仅在本机计算</div>
   <h1>先算清会不会囤过头，<br>再决定这次买几件</h1>
-  <p class="sub">把消耗速度、家里库存、效期、到货时间和价格优势全部算进去，<br>30 秒给出「买几套合适」的区间，而不是一句「值得买」。</p>
+  <p class="sub">把消耗速度、家里库存、有效期、到货时间和价格优势全部算进去，<br>30 秒给出「买几套合适」的区间，而不是一句「值得买」。</p>
   <div class="hbtns">
     <button class="btn primary" onclick="document.getElementById('sec-main').scrollIntoView({behavior:'smooth'})">立即计算</button>
     <button class="btn ghost" onclick="loadExample()">载入示例</button>
   </div>
-  <div class="hfeats"><span>自动保存</span><span>手机可用</span><span>不联网不上传</span><span>比价预售同口径</span></div>
+  <div class="hfeats"><span>自动保存</span><span>手机可用</span><span>不联网不上传</span><span>比价同口径</span></div>
 </div>
 
 <div class="wrap">
@@ -291,14 +413,12 @@
       <div class="col-inputs">
         <div id="staleBar"></div>
         <section class="card">
-          <div class="presetbar" id="presetRow"></div>
           <div class="modes" id="modeBar">
             <button data-mode="count"><b>🧖 按次用</b><small>面膜 / 一次性 · 一份一次</small></button>
             <button data-mode="volume"><b>🧴 按体积用</b><small>护肤套装 / 洗发水 · 不同 ml 组合</small></button>
             <button data-mode="pack"><b>🧺 按件用</b><small>洗衣液 / 纸巾 / 猫粮 · 一件用 N 天</small></button>
           </div>
           <div class="grid" id="k-inputs"></div>
-          <div id="vol-rows"></div>
         </section>
       </div>
       <aside class="col-result"><div id="k-out"></div></aside>
@@ -310,13 +430,14 @@
     <div class="page-lean">
       <div class="sec-head"><h1>套装比价</h1><p>已有明确候选方案时再用 · 口径与主流程一致（多批旧货 + 先到期先用）</p></div>
       <div class="card">
-        <p class="desc">按「到手价 ÷ 实际能用掉的量」排序<span class="q" data-tip="把「到期前用得掉多少」算进去：用不完的部分等于白花钱，所以标价低的方案未必划算。消耗模拟与主流程完全同口径：家里的多批旧货、先到期先用的规则都算在内。">?</span></p>
+        <p class="desc">按「到手价 ÷ 实际能用掉的量」排序<span class="q" data-tip="按到期前实际能用掉的量比价。
+库存和消耗规则与主流程一致。">?</span></p>
         <div id="cmp-sync" class="hint"></div>
         <div class="row-inline" style="margin-top:12px">
           <div class="field"><label>方案名称</label><input id="o-name" placeholder="如：京东自营 2 瓶装"></div>
           <div class="field" style="max-width:120px"><label>到手价（¥）</label><input id="o-price" type="number" min="0" placeholder="399"></div>
           <div class="field" style="max-width:170px"><label id="o-amountLabel">等效总量</label><input id="o-amount" type="number" min="0" step="0.1" value="232"></div>
-          <div class="field" style="max-width:140px"><label>新货效期（天）</label><input id="o-shelf" type="number" min="0" value="540"></div>
+          <div class="field" style="max-width:140px"><label>新货有效期（天）</label><input id="o-shelf" type="number" min="0" value="540"></div>
           <button class="btn primary" onclick="addOffer()">＋ 添加</button>
           <button class="btn ghost" onclick="resetCompare()">↺ 恢复示例</button>
         </div>
@@ -325,54 +446,25 @@
     </div>
   </section>
 
-  <!-- ================= 预售 vs 现货（两栏平铺，不再外嵌大框） ================= -->
-  <section class="sec" id="sec-vs">
-    <div class="page-lean">
-      <div class="sec-head"><h1>预售 vs 现货</h1><p>两种方式一起算：到货晚造成的断档 + 多吃不掉的浪费<span class="q" data-tip="预售与现货常常「到货时间不同、套装内容也不同」，所以放进同一次决策里比：既要看等货期间会不会断档，也要看多吃不掉的浪费。旧货按真实到期日参与「先到期先用」，不再把「用完日」当成「到期日」。">?</span></p></div>
-      <div id="vs-sync" class="hint" style="margin-bottom:12px"></div>
-      <div class="opt-grid">
-        <div class="card opt-card" id="opt-a" style="margin-bottom:0">
-          <h3><span>🛍️ 现货</span><span id="tag-a"></span></h3>
-          <div class="fields">
-            <div class="field"><label>到手价（¥）</label><input id="v-a-price" type="number" min="0"></div>
-            <div class="field"><label id="v-a-amountLabel">每套可用量</label><input id="v-a-amount" type="number" min="0" step="0.1"></div>
-            <div class="field"><label>赠品折算价值（¥）</label><input id="v-a-gift" type="number" min="0"></div>
-            <div class="field"><label>到货等待（天）</label><input id="v-a-wait" type="number" min="0"></div>
-            <div class="field"><label>新货效期（天）</label><input id="v-a-shelf" type="number" min="0"></div>
-          </div>
-        </div>
-        <div class="card opt-card" id="opt-b" style="margin-bottom:0">
-          <h3><span>⏳ 预售</span><span id="tag-b"></span></h3>
-          <div class="fields">
-            <div class="field"><label>到手价（¥）</label><input id="v-b-price" type="number" min="0"></div>
-            <div class="field"><label id="v-b-amountLabel">每套可用量</label><input id="v-b-amount" type="number" min="0" step="0.1"></div>
-            <div class="field"><label>赠品折算价值（¥）</label><input id="v-b-gift" type="number" min="0"></div>
-            <div class="field"><label>到货等待（天）</label><input id="v-b-wait" type="number" min="0"></div>
-            <div class="field"><label>新货效期（天）</label><input id="v-b-shelf" type="number" min="0"></div>
-          </div>
-        </div>
-      </div>
-      <div class="syncbar" style="margin-top:14px">
-        <button class="btn ghost sm" onclick="resetVsSync()">↺ 恢复与主流程联动</button>
-        <span>改动任意一栏后该栏停止自动跟随主流程，点左边按钮可恢复。</span>
-      </div>
-      <div class="card"><div id="v-out"></div></div>
-    </div>
-  </section>
-
   <!-- ================= 囤货拼单 ================= -->
   <section class="sec" id="sec-group">
     <div class="page-lean">
-      <div class="sec-head"><h1>囤货拼单分摊</h1><p>一大单买回来，几个人按各自真正需要的量分<span class="q" data-tip="针对囤货拼单：比如整单是「3 瓶 500ml 正装 + 5 份 20ml 小样」，谁要多少就摊多少。忽略邮费，也不是电商购物车的满减套路。">?</span></p></div>
+      <div class="sec-head"><h1>囤货拼单分摊</h1><p>一大单买回来，几个人按各自真正需要的量分<span class="q" data-tip="按每人认领的用量分摊货款。
+暂不计算邮费与满减。">?</span></p></div>
       <div class="card">
         <div id="g-sync" class="hint" style="margin:0 0 14px"></div>
 
-        <div class="sub-grid">
-          <div class="head" id="g-pack-head">这一单买回来的总量</div>
-          <div id="g-items"></div>
-          <div class="field"><label>整单到手价（¥）</label><input id="g-price" type="number" min="0"></div>
-          <div class="field"><label>总可分量</label><div id="g-total" style="margin-top:8px; font-size:13.5px; font-weight:700; color:var(--accent)"></div></div>
-          <div class="field"><button class="btn ghost sm" id="addGItem">＋ 加一个规格</button></div>
+        <div class="group-pack">
+          <div class="group-specs">
+            <div class="group-pack-title" id="g-pack-head">这一单买回来的总量</div>
+            <div id="g-items"></div>
+            <button class="btn ghost sm" id="addGItem">＋ 加一个规格</button>
+          </div>
+          <div class="group-pack-side">
+            <div class="group-pack-title">整单概览</div>
+            <div class="field"><label>整单到手价（¥）</label><input id="g-price" type="number" min="0"></div>
+            <div class="group-total"><span>总可分量</span><strong id="g-total"></strong></div>
+          </div>
         </div>
 
         <div class="row-inline" style="margin-top:16px">
@@ -395,38 +487,27 @@
   <section class="sec" id="sec-about">
     <div class="page-lean">
       <div class="sec-head"><h1>计算方法与口径</h1><p>主流程只给结论，解释都收在这一节</p></div>
-      <div class="card">
-        <h2>推荐为什么是三层</h2>
-        <p class="desc">「够用到下次大促」只是保守购买基准，不是合理购买区间</p>
-        <div class="tiers" style="margin-top:4px">
-          <div class="tier t1"><span class="idx">1</span><span class="tx"><b>撑到下次大促的最少</b><br><span style="color:var(--muted); font-size:12.5px">只满足「够用到下次大促」这个保守目标，不多占钱、不多占地方。</span></span></div>
-          <div class="tier t2"><span class="idx">2</span><span class="tx"><b>提前囤货段</b><br><span style="color:var(--muted); font-size:12.5px">这一段不是「不够用」，而是「提前买」——要靠这次价格更低才划算，不是默认合理。</span></span></div>
-          <div class="tier t3"><span class="idx">3</span><span class="tx"><b>效期上限</b><br><span style="color:var(--muted); font-size:12.5px">超过这个量，多买的部分会在效期内用不完，属于直接浪费。</span></span></div>
+      <div class="card method-card">
+        <div class="method-list">
+          <div class="method-row"><span>消耗顺序</span><p>只用已到货、未过期的货，优先用最早到期的一批。</p></div>
+          <div class="method-row"><span>到货等待</span><p>新货到货前不能用；若断档，会单独提示。</p></div>
+          <div class="method-row"><span>多批库存</span><p>不同到期日分开录入，避免把整批算作同一天过期。</p></div>
+          <div class="method-row"><span>套装比价</span><p>沿用主流程的库存和消耗规则，按实际可用量比较。</p></div>
+          <div class="method-row"><span>同款赠品</span><p>预计用掉的量并入可用量，不再重复抵扣价格。</p></div>
+          <div class="method-row"><span>非同款赠品</span><p>不并入正装用量；可按主观估值抵扣成本。</p></div>
         </div>
-
-        <h2 style="margin-top:22px">「大促时还剩」和「到期时剩」是两回事</h2>
-        <div class="kv" style="margin-top:8px"><span>「下次大促时预计还剩」</span><span style="text-align:right; max-width:62%">只是<b>提前把货和钱换成实物</b>：占资金、占收纳空间，但这些货仍然有效，留到大促之后继续用完全没问题。如果这次折扣足够好，这笔“占用”甚至是划算的。</span></div>
-        <div class="kv" style="margin-top:8px"><span>「到期时预计剩」</span><span style="text-align:right; max-width:62%">这才是<b>硬损失</b>：过了效期就一文不值，会把便宜单价反转成高成本。判断“囤过头”只看这个数。</span></div>
-
-        <h2 style="margin-top:22px">消耗模拟的规则</h2>
-        <div class="kv" style="margin-top:8px"><span>先到期先用</span><span style="text-align:right; max-width:62%">任何时刻只从「已经到货、还没过期」的批次里消耗，优先消耗最早到期的——家里的旧货和候选方案的新货排在同一条队伍里。</span></div>
-        <div class="kv" style="margin-top:8px"><span>未到货不能提前用</span><span style="text-align:right; max-width:62%">预售 / 海外购要等到货后才能开始消耗；到货前家里断档的天数会单独算给你看。</span></div>
-        <div class="kv" style="margin-top:8px"><span>多批旧货</span><span style="text-align:right; max-width:62%">旧货分几批、到期日差很多时，用「多批录入」分别填；只填一个最早到期日等于把整批当成同一天到期。</span></div>
-        <div class="kv" style="margin-top:8px"><span>比价 / 预售同口径</span><span style="text-align:right; max-width:62%">套装比价与预售比较用的是<b>同一个模拟器、同一批旧货数据</b>，所以不会出现「主流程说能用、比价区说浪费」的矛盾。</span></div>
-
-        <h2 style="margin-top:22px">赠品怎么算</h2>
-        <div class="kv" style="margin-top:8px"><span>同款 / 通用</span><span style="text-align:right; max-width:62%">只把「你预计会用掉的部分」并入可用量（进分母），不再抵扣价格——否则等于同一份赠品重复算两次优惠。</span></div>
-        <div class="kv" style="margin-top:8px"><span>不同产品</span><span style="text-align:right; max-width:62%">不能并入正装用量，只按你的主观估值抵扣成本（进分子）。实际付款始终单独显示。</span></div>
-
-        <h2 style="margin-top:22px">数据存在哪</h2>
-        <p class="desc" style="margin-top:8px">纯前端本地计算，不联网、不上传。你填的数据自动保存在本机浏览器（localStorage），刷新 / 关掉再打开都还在；放久了页面会提示你确认库存。</p>
       </div>
     </div>
   </section>
 
-  <footer>你填的数据自动保存在本机浏览器（localStorage），刷新/关掉再打开都还在，不会上传 · 大促日期默认取下一个 618 / 双 11 · <a href="javascript:void(0)" onclick="resetAll()" style="color:var(--faint)">清空重新填</a></footer>
+  <footer>你填的数据自动保存在本机浏览器，刷新或重新打开后仍在。</footer>
 </div>
 
+<dialog id="presetDialog" class="preset-dialog" aria-labelledby="presetTitle">
+  <div class="preset-dialog-head"><div><h2 id="presetTitle">选择一个示例</h2><p>选场景，再点一个例子查看完整计算结果</p></div><button type="button" class="preset-close" onclick="closePresetDialog()" aria-label="关闭">×</button></div>
+  <div id="presetScenes" class="preset-scenes" aria-label="示例场景"></div>
+  <div id="presetRow" class="preset-list"></div>
+</dialog>
 <div id="tip" hidden></div>
 
 <script>
@@ -465,7 +546,7 @@ const SCENES = {
   volume: { name: '按体积用', unit: 'ml' },
   pack:   { name: '按件用', unit: '件' },
 };
-const ASSUMED_SHELF = 180;   // 效期未知时的保守假设：到货后约 6 个月
+const ASSUMED_SHELF = 180;   // 有效期未知时的保守假设：到货后约 6 个月
 
 /* 每个场景各存一份输入，切换场景不丢数据 */
 /* vsNormal：这次到手单价 vs 平时；expKnown：是否知道这批新货的实际到期日；
@@ -506,7 +587,6 @@ function resetAll() {
   try { localStorage.removeItem(LS_KEY); } catch (e) {}
   ['count', 'volume', 'pack'].forEach(k => { state[k] = clone(DEFAULT_STATE[k]); });
   offers = clone(CMP_DEFAULTS[mode] || CMP_DEFAULTS.count); cmpDirty = false;
-  vsDirty = { a: false, b: false };
   gPack = null; gPackDirty = false; gMemberDirty = false;
   $('staleBar').innerHTML = '';
   renderInputs(); calcCore();
@@ -632,7 +712,7 @@ const T = t => t ? '<span class="q" data-tip="' + esc(t) + '" role="button" tabi
   function showTip(el) {
     const b = box(); if (!b) return;
     const t = el.getAttribute('data-tip'); if (!t) return;
-    b.innerHTML = t; b.hidden = false;
+    b.textContent = t.replace(/<[^>]*>/g, '').replace(/\\n/g, String.fromCharCode(10)); b.hidden = false;
     const r = el.getBoundingClientRect();
     const bw = b.offsetWidth, bh = b.offsetHeight;
     let left = Math.min(Math.max(8, r.left + r.width / 2 - bw / 2), window.innerWidth - bw - 8);
@@ -691,6 +771,10 @@ const T = t => t ? '<span class="q" data-tip="' + esc(t) + '" role="button" tabi
 
 /* 滑块字段：上行=指标名+数字框，中行=全宽滑块，下行=min/max 刻度。
    opts.cap：滑块上限（默认=max）。超过上限的值可通过数字框手动输入，滑块钉在最右、右刻度显示「20+套」。 */
+function choiceButtons(id, options, selected) {
+  return '<div class="segmented" role="group" aria-label="' + (id === 'k-rateMode' ? '消耗速度估算方式' : '这次单价与平时比较') + '">' +
+    options.map(([value, label]) => '<button type="button" data-choice-for="' + id + '" data-value="' + value + '" aria-pressed="' + (selected === value) + '">' + label + '</button>').join('') + '</div>';
+}
 function FS(id, label, val, min, max, step, tip, opts) {
   opts = opts || {};
   const cap = (opts.cap != null ? opts.cap : max);
@@ -740,20 +824,20 @@ function stockFieldHtml() {
       const lb = bottleLabel(sum, volBottle());
       txt = amt(sum, 'ml') + (lb ? '（≈' + lb + '）' : '');
     } else txt = amt(sum, sceneUnit());
-    return '<div class="field"><label>现在家里还有</label><div class="ro" id="k-stockRO">' + txt +
+    return '<div class="field stock-field"><label>现在家里还有</label><div class="ro" id="k-stockRO">' + txt +
       '<span class="sub">= 下方「旧货分批」各批合计 · 要改请在下面改</span></div></div>';
   }
   if (mode === 'volume') {
     const bottle = volBottle();
     const stockShown = s.stockUnit === 'bottle' ? Math.round(s.stock / bottle * 10) / 10 : Math.round(s.stock * 10) / 10;
-    return '<div class="field"><label>现在家里还剩' + T('数一下还没用完的量，包含快到期的那些。单位可以切 ml 或瓶。') + '</label><div class="pair">' +
+    return '<div class="field stock-field"><label>现在家里还剩' + T('填当前未用完的量。\n可切换 ml 或瓶。') + '</label><div class="pair">' +
       '<input id="k-stock" type="number" min="0" step="0.1" value="' + stockShown + '">' +
       '<select id="k-stockUnit" style="flex:0 0 78px">' +
       '<option value="ml"' + (s.stockUnit !== 'bottle' ? ' selected' : '') + '>ml</option>' +
       '<option value="bottle"' + (s.stockUnit === 'bottle' ? ' selected' : '') + '>瓶</option>' +
       '</select></div><div class="unit" id="k-stockTip"></div></div>';
   }
-  return '<div class="field"><label>现在家里还有（' + sceneUnit() + '）' + T('数一下还没用完的量（包含快到期的），大概数就行。') + '</label>' +
+  return '<div class="field stock-field"><label>现在家里还有（' + sceneUnit() + '）' + T('填当前未用完的量，快到期的也算。') + '</label>' +
     '<input id="k-stock" type="number" min="0" step="1" value="' + s.stock + '"></div>';
 }
 
@@ -771,75 +855,80 @@ function renderInputs() {
       '<input id="k-gap" type="number" min="1" value="' + s.gap + '">' +
       '<select id="k-gapUnit"><option value="1">天</option><option value="7">周</option></select></div>' +
       '<div class="unit" id="k-rateTip"></div></div>';
-    html += FS('k-perUse', '每次用几份', s.perUse, 0.5, 6, 0.5, '一次敷 1 片就填 1；有时一次用 2 片就填 2。', { unit: '份' });
+    html += FS('k-perUse', '每次用几份', s.perUse, 0.5, 6, 0.5, '按一次实际使用的份数填写。', { unit: '份' });
     html += stockFieldHtml();
   } else if (mode === 'volume') {
-    html += '<div class="field" style="grid-column:1/-1"><label>消耗速度怎么估 <span class="req">*</span></label>' +
-      '<select id="k-rateMode" style="max-width:230px">' +
-      '<option value="bottle"' + (s.rateMode !== 'daily' ? ' selected' : '') + '>我知道「一瓶能用多久」</option>' +
-      '<option value="daily"' + (s.rateMode === 'daily' ? ' selected' : '') + '>我知道「每天用多少」</option>' +
-      '</select></div>';
+    html += '<div class="field rate-choice"><label>消耗速度怎么估 <span class="req">*</span></label>' +
+      '<select id="k-rateMode" class="visually-hidden" aria-label="消耗速度估算方式">' +
+      '<option value="bottle"' + (s.rateMode !== 'daily' ? ' selected' : '') + '>按一瓶用多久</option>' +
+      '<option value="daily"' + (s.rateMode === 'daily' ? ' selected' : '') + '>按每天用多少</option></select>' +
+      choiceButtons('k-rateMode', [['bottle','按一瓶'],['daily','按每天']], s.rateMode) + '</div>';
     if (s.rateMode === 'daily') {
       html += FS('k-daily', '每天用多少（ml） <span class="req">*</span>', s.daily, 0.5, 30, 0.5,
-        '估不准就切到左边的「一瓶能用多久」——那个更好答。', { unit: 'ml' });
+        '不确定时，可切换为“按一瓶”估算。', { unit: 'ml' });
     } else {
       html += '<div class="field"><label>一瓶大概多少 ml <span class="req">*</span></label>' +
         '<input id="k-bottleMl" type="number" min="1" step="10" value="' + s.bottleMl + '" placeholder="如 500"></div>';
       html += FS('k-bottleDays', '这样一瓶够用多少天 <span class="req">*</span>', s.bottleDays, 3, 365, 1,
-        '不用自己估每天几毫升：按「多少 ml ÷ 够用多少天」倒推，页面会显示换算结果。', { unit: '天' });
+        '据此换算每天约用多少 ml。', { unit: '天' });
     }
-    html += '<div class="unit" id="k-rateTip" style="grid-column:1/-1"></div>';
     html += stockFieldHtml();
+    html += '<div class="rate-note" id="k-rateTip"></div>';
     lastStockUnit = s.stockUnit;
   } else {
     html += FS('k-perPack', '一件能用几天 <span class="req">*</span>', s.perPack, 1, 180, 1,
-      '一件能用几天，估个大概就行——下面按这个推算能撑多久。', { unit: '天' });
+      '填一件通常能用的天数。', { unit: '天' });
     html += stockFieldHtml();
   }
 
-  html += '<div class="grp-head">② 这次想买的套装' + T('填上「打算买几套」，就能判断这一单会不会囤过头——其余输入都是为这个结论服务的。') + '</div>';
+  html += '<div class="grp-head">② 这次想买的套装' + T('试填购买套数，查看是否会囤过头。') + '</div>';
+  if (mode === 'volume') html += '<div id="vol-rows" class="volume-fields"></div>';
   if (mode !== 'volume') html += FS('k-setSize', mode === 'count' ? '每套份数' : '每套件数', s.setSize, 1, 60, 1, null,
     { cap: 30, unit: mode === 'count' ? '份' : '件' });
-  html += '<div class="field"><label>套装到手价（¥）' + T('这一单实际要付的钱（含定金），不要减去赠品估值。') + '</label>' +
+  html += '<div class="field"><label>套装到手价（¥）' + T('填实际付款，包含定金。\n不要扣除赠品估值。') + '</label>' +
     '<input id="k-setPrice" type="number" min="0" value="' + s.setPrice + '"></div>';
   html += FS('k-planSets', '你打算买几套 <span class="req">*</span>', s.planSets, 0, 8, 1,
-    '拖滑块或滚轮试算：这是唯一需要你来试的一项，其它都是算术。要买超过 20 套请直接在右边输入。', { cap: 20, unit: '套' });
-  html += '<div class="field"><label>这次单价 vs 平时' + T('提前囤货那一段划不划算，取决于这一项：只有这次单价确实更低，多买才划算；只是「差不多」的话，多买只承担资金和空间。') + '</label>' +
-    '<select id="k-vsNormal">' +
-    '<option value="unknown"' + (s.vsNormal === 'unknown' ? ' selected' : '') + '>不知道 / 还没比</option>' +
-    '<option value="lower"' + (s.vsNormal === 'lower' ? ' selected' : '') + '>明显更低</option>' +
+    '拖动滑块试算。\n超过 20 套可直接输入。', { cap: 20, unit: '套' });
+  html += '<div class="field price-context"><label>这次单价 vs 平时' + T('提前囤货需要价格优势。\n按这次与平时的单价选择。') + '</label>' +
+    '<select id="k-vsNormal" class="visually-hidden" aria-label="这次单价与平时比较">' +
+    '<option value="unknown"' + (s.vsNormal === 'unknown' ? ' selected' : '') + '>还没比价</option>' +
+    '<option value="lower"' + (s.vsNormal === 'lower' ? ' selected' : '') + '>更便宜</option>' +
     '<option value="same"' + (s.vsNormal === 'same' ? ' selected' : '') + '>差不多</option>' +
-    '<option value="higher"' + (s.vsNormal === 'higher' ? ' selected' : '') + '>反而更高</option></select></div>';
+    '<option value="higher"' + (s.vsNormal === 'higher' ? ' selected' : '') + '>更贵</option></select>' +
+    choiceButtons('k-vsNormal', [['unknown','未比价'],['lower','更便宜'],['same','差不多'],['higher','更贵']], s.vsNormal) + '</div>';
 
   html += '<div class="grp-head">③ 关键日期</div>';
-  html += '<div class="field"><label>下次大促日期</label><input id="k-sale" type="date" value="' + s.sale + '">' +
+  html += '<div class="field"><label>下次大促日期' + T('默认下一个 618 或双 11。\n可改为你的下次购买日期。') + '</label><input id="k-sale" type="date" value="' + s.sale + '">' +
     '<div class="unit" id="k-saleTip"></div></div>';
 
-  html += '<details class="adv"' + (state['_advOpen'] ? ' open' : '') + '><summary>有效期 / 到货时间 / 多批旧货（已按典型值预填，通常不用动）</summary>' +
+  html += '<details class="adv"' + (state['_advOpen'] ? ' open' : '') + '><summary>有效期、到货与多批库存（选填）</summary>' +
     '<div class="adv-body">' +
-    '<div class="field"><label>这批新货的到期日' + T('直播间 / 整箱货常常看不到批次到期日。不确定就选「不知道」，页面会按假设效期估算，并把所有结论标注成估算值。') + '</label><select id="k-expKnown">' +
+    '<div class="field"><label>这批新货的到期日' + T('不确定到期日就选“不知道”。\n结果会标注为估算。') + '</label><select id="k-expKnown">' +
       '<option value="1"' + (s.expKnown !== false ? ' selected' : '') + '>知道实际到期日</option>' +
-      '<option value="0"' + (s.expKnown === false ? ' selected' : '') + '>不知道（按假设效期估算）</option></select></div>' +
+      '<option value="0"' + (s.expKnown === false ? ' selected' : '') + '>不知道（按假设有效期估算）</option></select></div>' +
     (s.expKnown === false
-      ? '<div class="field"><label>假设效期</label><div class="unit" style="margin-top:8px; font-size:13px; color:var(--text)">按「到货后约 <b>' + ASSUMED_SHELF + ' 天</b>」估算<br><span style="color:var(--faint)">结论一律标注为估算，不保证「不会过期」</span></div></div>'
+      ? '<div class="field"><label>假设有效期</label><div class="unit" style="margin-top:8px; font-size:13px; color:var(--text)">按「到货后约 <b>' + ASSUMED_SHELF + ' 天</b>」估算<br><span style="color:var(--faint)">结论一律标注为估算，不保证「不会过期」</span></div></div>'
       : '<div class="field"><label>本次新货到期日</label><input id="k-newExp" type="date" value="' + s.newExp + '"></div>') +
-    '<div class="field"><label>预计到货日' + T('预售 / 海外购常常要等。到货晚于大促时，这一单就补不上大促前的缺口——页面会直接这么说。') + '</label>' +
+    '<div class="field"><label>预计到货日' + T('新货到货前不能使用。\n若大促前断档，结果会提示。') + '</label>' +
       '<input id="k-arrive" type="date" value="' + s.arrive + '">' +
       '<div class="unit" id="k-arriveTip"></div></div>' +
-    '<div class="field"><label>家里旧货最早到期日' + T('家里最旧那批的到期日。旧货有好几批、到期日差很多时，用下面的「多批录入」会更准。') + '</label>' +
+    '<div class="field"><label>家里旧货最早到期日' + T('填最早到期的一批。\n到期日不同可用多批录入。') + '</label>' +
       '<input id="k-oldExp" type="date" value="' + s.oldExp + '"></div>' +
     '</div>' + oldBatchUI() + '</details>';
 
+  $('k-inputs').dataset.mode = mode;
+  $('k-inputs').dataset.rate = mode === 'volume' ? s.rateMode : '';
   $('k-inputs').innerHTML = html;
   ['k-gap','k-gapUnit','k-perUse','k-stock','k-daily','k-perPack','k-bottleMl','k-bottleDays','k-oldExp','k-sale','k-setSize','k-setPrice','k-planSets','k-newExp','k-arrive']
     .forEach(id => { if ($(id)) $(id).addEventListener('input', () => { syncStateFromInputs(); calcCore(); }); });
   bindRanges($('k-inputs'));
   if ($('k-vsNormal')) $('k-vsNormal').addEventListener('change', () => { syncStateFromInputs(); calcCore(); });
-  // 效期「知不知道」切换 → 需要重画输入区
+  // 有效期「知不知道」切换 → 需要重画输入区
   if ($('k-expKnown')) $('k-expKnown').addEventListener('change', () => { syncStateFromInputs(); renderInputs(); calcCore(); });
   bindOldBatchInputs();
   // 消耗速度的估算方式切换 → 需要重画输入区（字段跟着换）
   if ($('k-rateMode')) $('k-rateMode').addEventListener('change', () => { syncStateFromInputs(); renderInputs(); calcCore(); });
+  $('k-inputs').querySelectorAll('[data-choice-for]').forEach(b => b.addEventListener('click', () => { const sel = $(b.dataset.choiceFor); if (!sel) return; sel.value = b.dataset.value; b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); sel.dispatchEvent(new Event('change', { bubbles: true })); }));
   // 库存单位在 瓶 / ml 之间切换 → 保持物理量不变，只换显示口径
   if ($('k-stockUnit')) $('k-stockUnit').addEventListener('change', () => {
     const b = volBottle(), v = num('k-stock');
@@ -849,7 +938,7 @@ function renderInputs() {
   });
   const adv = $('k-inputs').querySelector('details.adv');
   if (adv) adv.addEventListener('toggle', () => { state['_advOpen'] = adv.open; });
-  $('k-saleTip').textContent = '距今天 ' + dayDiff(s.sale) + ' 天' + (s.sale === dateToStr(nextSale()) ? '（默认取下一个 618/双11）' : '');
+  $('k-saleTip').textContent = '还有 ' + dayDiff(s.sale) + ' 天';
   if ($('k-arriveTip')) {
     const ad = dayDiff(s.arrive);
     $('k-arriveTip').textContent = ad <= 0 ? '立即到货（默认）' : '还要等 ' + ad + ' 天到货';
@@ -864,17 +953,17 @@ function renderInputs() {
       ? Math.max(0.01, s.daily || 0.01) : Math.max(0.01, (s.bottleMl || 100) / Math.max(1, s.bottleDays || 30));
     if ($('k-rateTip')) $('k-rateTip').innerHTML = '换算：<b>≈ ' + r1(daily) + ' ml/天</b>，一瓶能用约 ' +
       Math.round(b / daily) + ' 天。';
-    if ($('k-stockTip')) $('k-stockTip').innerHTML = '约等于 <b>' + r1(s.stock / b) + ' 瓶</b>（按 ' + b + 'ml/瓶 折算）。';
+    if ($('k-stockTip')) $('k-stockTip').innerHTML = '约 <b>' + r1(s.stock / b) + ' 瓶</b>';
   }
 
-  if (mode === 'volume') renderVolRows(); else $('vol-rows').innerHTML = '';
+  if (mode === 'volume') renderVolRows();
   renderPresets();
 }
 
 function renderVolRows() {
   const s = state.volume;
   let html = '<div class="sub-grid"><div class="head">套装的规格组合' +
-    T('正装、小样各占一行（如 500ml×1 + 20ml×5），页面自动合计每套的等效 ml。') + '</div>';
+    T('正装与小样分行填写。\n系统自动合计每套容量。') + '</div>';
   s.post.forEach((p, i) => {
     html += '<div class="spec-row">' +
       '<div class="field"><label>容量（ml）</label><input class="spec-ml" data-i="' + i + '" type="number" min="0" value="' + p.ml + '"></div>' +
@@ -882,17 +971,20 @@ function renderVolRows() {
       '<button class="del" data-del="' + i + '" title="删除该规格">✕</button></div>';
   });
   html += '</div>' +
-    '<div class="sub-grid"><div class="head">赠品' +
-      T('先分清是不是同款：<b>同款</b>只把「你预计会用掉的部分」并入可用量（进分母），不再抵扣价格——否则等于同一份赠品重复算两次优惠；<b>不同产品</b>不能并入正装用量，只按你的主观估值抵扣成本（进分子）。实际付款始终单独显示，不因估值而变。') +
+    '<div class="sub-grid gift-grid"><div class="head">赠品' +
+      T('同款：预计用掉的量并入可用量。\n非同款：按估值抵扣成本。') +
       '</div>' +
-    '<div class="field"><label>赠品实收合计（ml）</label><input id="spec-gift" type="number" min="0" value="' + s.giftMl + '"></div>' +
-    FS('spec-use', '其中你预计会用掉（%）', s.giftUse, 0, 100, 5, '用不完的赠品不该算进你的可用量。', { unit: '%' }) +
-    '<div class="field"><label>赠品能否与正装合并计算用量</label><select id="spec-merge">' +
+    '<div class="field"><label>赠品总量（ml）</label><input id="spec-gift" type="number" min="0" value="' + s.giftMl + '"></div>' +
+    FS('spec-use', '预计用掉（%）', s.giftUse, 0, 100, 5, '只计入预计会用掉的赠品。', { unit: '%' }) +
+    '<div class="field"><label>赠品能否合并用量</label><select id="spec-merge" class="visually-hidden">' +
       '<option value="1"' + (s.giftMerge ? ' selected' : '') + '>能（同款 / 通用）</option>' +
-      '<option value="0"' + (s.giftMerge ? '' : ' selected') + '>不能（不同产品）</option></select></div>' +
-    '<div class="field"><label>你认为这些赠品值多少钱（¥）' + T('只有选「不能合并」时，这个估值才会用来抵扣成本。') + '</label>' +
-      '<input id="spec-value" type="number" min="0" value="' + s.giftValue + '"></div>' +
-    '<div class="head" id="volTotal" style="color:var(--accent)"></div>' +
+      '<option value="0"' + (s.giftMerge ? '' : ' selected') + '>不能（不同产品）</option></select>' +
+      '<div class="segmented" role="group" aria-label="赠品能否合并用量">' +
+      '<button type="button" data-merge="1" aria-pressed="' + s.giftMerge + '">能合并</button>' +
+      '<button type="button" data-merge="0" aria-pressed="' + !s.giftMerge + '">不能合并</button></div></div>' +
+    (s.giftMerge ? '' : '<div class="field"><label>赠品估值（¥）' + T('估值影响实际成本，不改变付款金额。') + '</label>' +
+      '<input id="spec-value" type="number" min="0" value="' + s.giftValue + '"></div>') +
+    '<div class="head" id="volTotal"></div>' +
     '<div class="field"><button class="btn ghost sm" id="addSpec">＋ 加一个规格</button></div></div>';
   $('vol-rows').innerHTML = html;
 
@@ -904,8 +996,12 @@ function renderVolRows() {
   }));
   $('spec-gift').addEventListener('input', el => { state.volume.giftMl = parseFloat(el.target.value) || 0; renderVolTotal(); calcCore(); });
   $('spec-use').addEventListener('input', el => { state.volume.giftUse = parseFloat(el.target.value) || 0; renderVolTotal(); calcCore(); });
-  $('spec-value').addEventListener('input', el => { state.volume.giftValue = parseFloat(el.target.value) || 0; renderVolTotal(); calcCore(); });
-  $('spec-merge').addEventListener('change', el => { state.volume.giftMerge = el.target.value === '1'; renderVolTotal(); calcCore(); });
+  if ($('spec-value')) $('spec-value').addEventListener('input', el => { state.volume.giftValue = parseFloat(el.target.value) || 0; renderVolTotal(); calcCore(); });
+  $('spec-merge').addEventListener('change', el => { state.volume.giftMerge = el.target.value === '1'; renderVolRows(); calcCore(); });
+  $('vol-rows').querySelectorAll('[data-merge]').forEach(b => b.addEventListener('click', () => {
+    $('spec-merge').value = b.dataset.merge;
+    $('spec-merge').dispatchEvent(new Event('change', { bubbles: true }));
+  }));
   bindRanges($('vol-rows'));
   $('vol-rows').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
     state.volume.post.splice(+b.dataset.del, 1); renderInputs(); calcCore();
@@ -923,12 +1019,11 @@ function renderVolTotal() {
   if (s.giftMerge) {
     h = '每套可用于消耗的量 = 正装 ' + Math.round(pos) + ' ml' + (giftUse > 0 ? ' + 同款赠品可用 ' + Math.round(giftUse) + ' ml' : '') +
       ' = <b>' + Math.round(pos + giftUse) + ' ml</b>';
-    sub = '同款赠品按「实物」计入用量：实收 ' + Math.round(s.giftMl) + ' ml，其中你预计会用掉 ' + Math.round(s.giftMl * s.giftUse / 100) +
-      ' ml。<b>它只增加能用的量，不再重复抵扣价格</b>（同款赠品本来就是这单里的一部分）。';
+    sub = '赠品实收 ' + Math.round(s.giftMl) + ' ml，预计用掉 ' + Math.round(s.giftMl * s.giftUse / 100) +
+      ' ml。\n已计入可用量，不再抵扣价格。';
   } else {
     h = '每套可用于消耗的量 = 正装 ' + Math.round(pos) + ' ml（赠品不并入）';
-    sub = '赠品是别的产品（实收 ' + Math.round(s.giftMl) + ' ml），不能和正装合并计算用量，所以<b>不进入分母</b>；' +
-      '只按你的主观估值 ' + fmt(s.giftValue) + ' <b>抵扣成本</b>（进入分子）。实际付款仍是 ' + fmt(s.setPrice) + '，页面会单独显示。';
+    sub = '非同款赠品不并入容量。\n估值 ' + fmt(s.giftValue) + ' 仅用于成本计算。';
   }
   el.innerHTML = h + ' ' + T(sub);
 }
@@ -941,7 +1036,7 @@ function oldBatchUI() {
 
   let h = '<div class="sub-grid" style="margin-top:10px">' +
     '<div class="head">旧货不止一批？' +
-      T('只填一个「最早到期日」，等于把整批库存当成同一天到期；旧货分几批、到期日差得多时，分开填才能算准过期浪费。') +
+      T('到期日不同的旧货请分批填写。\n否则会按同一天到期估算。') +
       (on ? ' <span class="pill">已接管库存</span>' : (list.length ? ' <span class="pill warnpill">草稿 · 还没生效</span>' : '')) + '</div>';
   list.forEach((b, i) => {
     h += '<div class="ob-row"><div class="field"><label>第 ' + (i + 1) + ' 批数量（' + sceneUnit() + '）</label>' +
@@ -1151,7 +1246,7 @@ function calcCore() {
   const planSets = Math.max(0, s.planSets), plan = planSets * setAmount;
   const sale = dayDiff(s.sale), arrive = dayDiff(s.arrive);
   const expKnown = s.expKnown !== false;
-  const newExp = expKnown ? dayDiff(s.newExp) : (arrive + ASSUMED_SHELF);   // 效期未知 → 用假设值
+  const newExp = expKnown ? dayDiff(s.newExp) : (arrive + ASSUMED_SHELF);   // 有效期未知 → 用假设值
   const oldBs = dv.oldBatches;
   const oldExp = oldBs.length ? Math.min.apply(null, oldBs.map(b => b.expiry)) : 0;
   const unitPrice = setAmount > 0 ? setPrice / setAmount : 0;
@@ -1177,13 +1272,13 @@ function calcCore() {
   const maxNewBySale = ((simulate(oldBs.concat([newBatch(1e12)]), r, sale).byId('new') || {}).used) || 0;
   const maxNoWaste   = ((simulate(oldBs.concat([newBatch(1e12)]), r).byId('new') || {}).used) || 0;
 
-  /* ---- 三层：① 撑到大促的最少 ② 提前囤货段 ③ 效期上限 ---- */
+  /* ---- 三层：① 撑到大促的最少 ② 提前囤货段 ③ 有效期上限 ---- */
   const EPS = 1e-6;
   const needToSale = sale * r;                                     // 撑到大促的保守需求量
   const shortBySale = Math.max(0, needToSale - oldBySale);          // 必须由新货补上的部分
   const maxSetsNoWaste = Math.floor(maxNoWaste / setAmount + 1e-9);
   const setsBySale = shortBySale > EPS ? Math.ceil(shortBySale / setAmount - 1e-9) : 0;
-  const tooLate = shortBySale > EPS && maxNewBySale <= EPS;         // 到货太晚 / 效期太短，本单赶不上
+  const tooLate = shortBySale > EPS && maxNewBySale <= EPS;         // 到货太晚 / 有效期太短，本单赶不上
   const lateByArrival = arrive > sale + EPS;
 
   let kind;
@@ -1215,7 +1310,7 @@ function calcCore() {
   const shortQty = Math.max(0, needToSale - usedBySale);
   const gapDays = (r > EPS && sale > EPS) ? Math.max(0, Math.ceil(sale - usedBySale / r - 1e-9)) : 0;
   const perU = U === 'ml' ? '每毫升' : '每' + U;
-  const assumedTag = expKnown ? '' : '（效期按假设 ' + ASSUMED_SHELF + ' 天估算）';
+  const assumedTag = expKnown ? '' : '（有效期按假设 ' + ASSUMED_SHELF + ' 天估算）';
 
   let planBand = 'empty';
   if (planSets > 0) {
@@ -1230,13 +1325,13 @@ function calcCore() {
   const saleNote = leftAtSale <= 0.05 ? '届时已用完'
     : (expiredBySale >= leftAtSale - 0.05 ? '届时已过期'
       : (expiredBySale > 0.05 ? '含 ' + show(expiredBySale) + ' 已过期' : '提前占用 · 不算亏'));
-  const endNote = leftAtEnd > 0.05 ? '浪费 ' + fmt(leftAtEnd * unitPrice) : (expKnown ? '无过期浪费' : '按假设效期估算');
+  const endNote = leftAtEnd > 0.05 ? '浪费 ' + fmt(leftAtEnd * unitPrice) : (expKnown ? '无过期浪费' : '按假设有效期估算');
   const tilesHtml = '<div class="dtiles">' +
     '<div class="dtile"><div class="k">下次大促时还剩</div><div class="v">' + metricV(leftAtSale) + '</div><div class="n">' + saleNote + '</div></div>' +
     '<div class="dtile' + (leftAtEnd > 0.05 ? ' hard' : '') + '"><div class="k">到期时剩（浪费）</div><div class="v">' + metricV(leftAtEnd) + '</div><div class="n">' + endNote + '</div></div>' +
     '</div>';
 
-  /* ---- 结论：给出三层（撑到大促 / 提前囤货 / 效期上限），而不是「一律合理」 ---- */
+  /* ---- 结论：给出三层（撑到大促 / 提前囤货 / 有效期上限），而不是「一律合理」 ---- */
   let vCls = 'good', vIc = '✅', vTxt, note = '';
   if (kind === 'none') {
     if (plan > 0) {
@@ -1261,21 +1356,21 @@ function calcCore() {
     note = '规格不匹配，与买几套无关：1 套就已经超出到期前能吃下的量。';
   } else if (kind === 'limited') {
     vCls = 'warn'; vIc = '⏳';
-    vTxt = '受效期' + (lateByArrival ? '与到货时间' : '') + '限制，这批新货在大促前最多只能补上 ' + show(maxNewBySale) + assumedTag +
+    vTxt = '受有效期' + (lateByArrival ? '与到货时间' : '') + '限制，这批新货在大促前最多只能补上 ' + show(maxNewBySale) + assumedTag +
       '，还不够缺口的 ' + show(shortBySale) + '；<b>最多买 ' + maxSetsNoWaste + ' 套不会用过期</b>。缺口建议大促后再补一次，或换更耐放的渠道。';
     note = '这一单可以买，但撑不满整个周期——后面还需要一次补货。';
   } else if (planBand === 'empty') {
     vCls = 'warn'; vIc = '🧮';
     vTxt = '你还没填打算买几套。参考三层：撑到大促至少 <b>' + setsBySale + ' 套</b>；' +
-      (maxSetsNoWaste > setsBySale ? (setsBySale + 1) + ' ~ ' + maxSetsNoWaste + ' 套属于提前囤货（要靠价格优势支持）' : '效期内没有多余的提前囤货空间') +
+      (maxSetsNoWaste > setsBySale ? (setsBySale + 1) + (maxSetsNoWaste > setsBySale + 1 ? ' ~ ' + maxSetsNoWaste : '') + ' 套属于提前囤货（要靠价格优势支持）' : '有效期内没有多余的提前囤货空间') +
       '；超过 ' + maxSetsNoWaste + ' 套会用过期。';
     note = '填上「打算买几套」，就能判断这一单是不是囤过头。';
   } else if (planBand === 'over') {
     vCls = 'bad'; vIc = '⚠️';
     vTxt = '会囤过头：计划买 ' + show(plan) + ' 里有 <b>' + show(newWaste) + '</b>（' + fmt(newWaste * unitPrice) +
-      '）在效期内用不完。' + perU + '实际成本从 ' + fmt(unitPrice) + ' 升到 <b>' + fmt(effUnit) + '</b>。效期上限是 ' +
+      '）在有效期内用不完。' + perU + '实际成本从 ' + fmt(unitPrice) + ' 升到 <b>' + fmt(effUnit) + '</b>。有效期上限是 ' +
       maxSetsNoWaste + ' 套（' + show(maxSetsNoWaste * setAmount) + '）。';
-    note = '超过效期上限的部分不是「提前囤」，而是直接扔掉。';
+    note = '超过有效期上限的部分不是「提前囤」，而是直接扔掉。';
   } else if (planBand === 'short') {
     vCls = 'warn'; vIc = '🕳️';
     vTxt = '买少了：现有 + 本次大约只够用 ' + Math.round((oldUsed + newUsed) / r) + ' 天，到下次大促前会断档约 <b>' + gapDays +
@@ -1291,9 +1386,9 @@ function calcCore() {
       fmt(extraCost) + '（按年化 3% 的机会成本约 ' + fmt(extraCapCost) + ' ≈ 货价的 ' + pct(extraCapPct) + '）。';
     if (vsNormal === 'lower') {
       vIc = '👍';
-      vTxt = '属于提前囤货，<b>但有价格优势支持</b>：' + aheadCore + '既然这次单价确实更低，多囤这一段是划算的——只要别超过效期上限 ' +
+      vTxt = '属于提前囤货，<b>但有价格优势支持</b>：' + aheadCore + '既然这次单价确实更低，多囤这一段是划算的——只要别超过有效期上限 ' +
         maxSetsNoWaste + ' 套。';
-      note = '有折扣支撑的提前囤货，记得在效期前用完。';
+      note = '有折扣支撑的提前囤货，记得在有效期前用完。';
     } else if (vsNormal === 'unknown') {
       vCls = 'info'; vIc = '❓';
       vTxt = '这一段属于<b>提前囤货，需要价格优势来支持</b>：' + aheadCore + '建议先确认这次到手单价比平时低多少——只要低过约 ' +
@@ -1313,15 +1408,15 @@ function calcCore() {
   if (kind === 'none') recLine = '<b>保守结论：这次可以先不买</b><span style="color:var(--faint)">（现有量够用到下次大促）</span>';
   else if (kind === 'late') recLine = '<b>本单撑不到大促：它赶不上大促前的缺口</b>';
   else if (kind === 'unfit') recLine = '<b>不建议按这套买</b><span style="color:var(--faint)">（1 套就超出到期前能吃下的 ' + show(maxNoWaste) + '）</span>';
-  else if (kind === 'limited') recLine = '<b>效期内最多买到 ' + show(maxSetsNoWaste * setAmount) + '（' + maxSetsNoWaste + ' 套）</b><span style="color:var(--faint)">（撑不到大促的部分，之后再补）</span>';
-  else recLine = '<b>撑到大促 ' + setsBySale + ' 套 · 提前囤货 ' + (setsBySale + 1) + ' ~ ' + maxSetsNoWaste + ' 套 · 效期上限 ' + maxSetsNoWaste + ' 套</b>';
+  else if (kind === 'limited') recLine = '<b>有效期内最多买到 ' + show(maxSetsNoWaste * setAmount) + '（' + maxSetsNoWaste + ' 套）</b><span style="color:var(--faint)">（撑不到大促的部分，之后再补）</span>';
+  else recLine = '<b>撑到大促 ' + setsBySale + ' 套 · 提前囤货 ' + (maxSetsNoWaste > setsBySale ? (setsBySale + 1) + (maxSetsNoWaste > setsBySale + 1 ? ' ~ ' + maxSetsNoWaste : '') + ' 套' : '无') + ' · 有效期上限 ' + maxSetsNoWaste + ' 套</b>';
 
   /* ---- 一句话结论（供扫读的大标题） ---- */
   let vHead;
   if (kind === 'none') vHead = '这次可以不买';
   else if (kind === 'late') vHead = '本单赶不上大促';
   else if (kind === 'unfit') vHead = '规格不适合，别按这套买';
-  else if (kind === 'limited') vHead = '效期内最多买 ' + maxSetsNoWaste + ' 套';
+  else if (kind === 'limited') vHead = '有效期内最多买 ' + maxSetsNoWaste + ' 套';
   else if (planBand === 'empty') vHead = '先填「打算买几套」';
   else if (planBand === 'over') vHead = '会囤过头';
   else if (planBand === 'short') vHead = '买少了，会断档';
@@ -1337,7 +1432,7 @@ function calcCore() {
   else if (kind === 'unfit') vSub = '连 1 套（' + show(setAmount) + '）都吃不完，建议换小包装或拼单';
   else if (kind === 'limited') vSub = '最多 <b>' + maxSetsNoWaste + ' 套</b>不浪费 · 缺口大促后再补';
   else if (planBand === 'empty') vSub = '填上「打算买几套」，立刻出结论';
-  else if (planBand === 'over') vSub = '<b>' + show(newWaste) + '</b>（' + fmt(newWaste * unitPrice) + '）在效期内用不完';
+  else if (planBand === 'over') vSub = '<b>' + show(newWaste) + '</b>（' + fmt(newWaste * unitPrice) + '）在有效期内用不完';
   else if (planBand === 'short') vSub = '至少 <b>' + setsBySale + ' 套</b>才撑到大促，否则断档约 ' + gapDays + ' 天';
   else if (planBand === 'just') vSub = '最保守的一档：不多占钱、不多占地方';
   else vSub = vsNormal === 'lower'
@@ -1347,7 +1442,7 @@ function calcCore() {
   /* ---- 区间条可视化：三层「买几套」落在图上一眼看清 ---- */
   let rangeHtml;
   if (kind === 'late') {
-    rangeHtml = '<p class="desc" style="margin:0">到货晚于下次大促（或效期太短），这一单赶不上大促前的缺口——它只能为下一轮补货做准备。</p>';
+    rangeHtml = '<p class="desc" style="margin:0">到货晚于下次大促（或有效期太短），这一单赶不上大促前的缺口——它只能为下一轮补货做准备。</p>';
   } else {
     const capSets0 = Math.max(planSets, maxSetsNoWaste, Math.min(setsBySale, 60), 1);
     let z1 = Math.max(0, Math.min(setsBySale, maxSetsNoWaste));
@@ -1361,16 +1456,16 @@ function calcCore() {
       : '';
     const cur = b => planBand === b ? ' cur' : '';
     const l2v = maxSetsNoWaste > setsBySale
-      ? '<b>' + (setsBySale + 1) + ' ~ ' + maxSetsNoWaste + ' 套</b>（每多 1 套 ≈ 提前囤 ' + Math.round(daysPerSet) + ' 天，要价格优势）'
-      : '无——效期内只有第 ① 段安全';
-    const l3v = maxSetsNoWaste > 0 ? '<b>' + maxSetsNoWaste + ' 套</b>，超过＝过期浪费' : '这批效期内连 1 套都吃不下';
-    const l3tag = expKnown ? '' : '（效期按假设 ' + ASSUMED_SHELF + ' 天估算，以收到货的包装为准）';
-    rangeHtml = '<div class="rangebar">' + zone(z1, 'g') + zone(z2, 'o') + zone(z3, 'r') + pin + '</div>' +
+      ? '<b>' + (setsBySale + 1) + (maxSetsNoWaste > setsBySale + 1 ? ' ~ ' + maxSetsNoWaste : '') + ' 套</b>（每多 1 套 ≈ 提前囤 ' + Math.round(daysPerSet) + ' 天，要价格优势）'
+      : '无——有效期内只有第 ① 段安全';
+    const l3v = maxSetsNoWaste > 0 ? '<b>' + maxSetsNoWaste + ' 套</b>，超过＝过期浪费' : '这批有效期内连 1 套都吃不下';
+    const l3tag = expKnown ? '' : '（有效期按假设 ' + ASSUMED_SHELF + ' 天估算，以收到货的包装为准）';
+    rangeHtml = '<div class="rangebar"><div class="zones">' + zone(z1, 'g') + zone(z2, 'o') + zone(z3, 'r') + '</div>' + pin + '</div>' +
       '<div class="rbscale"><span>0 套</span><span>' + capSets + ' 套</span></div>' +
       '<div class="rblegend">' +
         '<div class="li' + cur('just') + cur('short') + '"><span class="dot g"></span><span>① 撑到下次大促的最少：<b>' + setsBySale + ' 套</b></span></div>' +
         '<div class="li' + cur('ahead') + '"><span class="dot o"></span><span>② 提前囤货段：' + l2v + '</span></div>' +
-        '<div class="li' + cur('over') + '"><span class="dot r"></span><span>③ 效期上限：' + l3v + l3tag + '</span></div>' +
+        '<div class="li' + cur('over') + '"><span class="dot r"></span><span>③ 有效期上限：' + l3v + l3tag + '</span></div>' +
       '</div>' +
       '<div style="margin-top:10px; font-size:12.5px; color:var(--muted)">🎯 ' + recLine + '</div>';
   }
@@ -1381,44 +1476,51 @@ function calcCore() {
     ? '<div class="dbar' + (newWaste > 0.05 ? ' warn' : '') + '"><div class="dl"><span>这批新货到期前能用掉</span><b>' + pct(useRatio) + '</b></div>' +
       '<div class="track"><div class="fill" style="width:' + Math.round(useRatio * 100) + '%"></div></div></div>'
     : '';
-  const diffTip = '「大促时还剩」＝提前占用：占钱占地方，但货仍然有效，折扣足够好甚至是划算的。「到期时剩」＝硬损失：过了效期一文不值。判断会不会囤过头，只看「到期时剩」这个数。';
+  const diffTip = '大促时还剩：提前买入，货仍有效。\n到期时还剩：预计用不完，会计入成本。';
+  const costHtml = plan > 0 ? '<div class="dcost"><span class="label">' + perU + '实际成本 <span class="base">标称 ' + fmt(unitPrice) + '</span></span><strong class="value">' + (newUsed > EPS ? fmt(effUnit) : '用不上') + '</strong></div>' : '';
   let html = '<div class="dhero rhero ' + vCls + '">' +
     '<div class="dtop"><span class="rk">这一单的结论</span><span class="q" data-tip="' + diffTip + '">?</span></div>' +
     '<div class="rh">' + vHead + '</div>' +
     '<div class="rs">' + vSub + '</div>' +
-    tilesHtml + barHtml + '</div>';
+    tilesHtml + costHtml + barHtml + '</div>';
 
-  html += '<div class="card"><h2 style="font-size:15px">买几套合适</h2>' + rangeHtml + '</div>';
+  html += '<div class="card range-card"><h2 style="font-size:15px">买几套合适</h2>' + rangeHtml + '</div>';
 
-  /* ---- 明细：默认展开、浅色小字；长解释也收在这里，不与结论抢注意力 ---- */
-  const oldDesc = dv.multiOld
-    ? '现有库存 ' + show(stock) + '（分 ' + oldBs.filter(b => b.units > 0).length + ' 批，最早 ' + Math.round(oldExp) + ' 天后到期）'
-    : '现有库存 ' + show(stock) + '，' + Math.round(oldExp) + ' 天后到期';
-  html += '<div class="card"><details open class="detail"><summary>计算明细（口径与过程）</summary><div class="body">' +
-    '<div class="kv"><span>消耗速度</span><b class="num">' + dv.rateDesc + '</b></div>' +
-    '<div class="kv"><span>本次套装</span><b class="num">' + dv.setDesc + '</b></div>' +
-    '<div class="kv"><span>实际付款</span><b class="num">' + fmt(listPrice) + ' / 套（' + fmt(unitPrice) + ' / ' + U + '）</b></div>' +
-    (arrive > 0 ? '<div class="kv"><span>到货时间</span><b class="num">还要等 ' + arrive + ' 天</b></div>' : '') +
-    '<div class="kv"><span>' + oldDesc + '</span><b class="num">能用掉 ' +
-      show(oldUsed) + (oldWaste > 0.05 ? '，浪费 ' + show(oldWaste) : '') + '</b></div>' +
-    (plan > 0 ? '<div class="kv"><span>本次新货 ' + show(plan) + '，' + Math.round(newExp) + ' 天后到期' + assumedTag + '</span><b class="num">能用掉 ' +
-      show(newUsed) + (newWaste > 0.05 ? '，浪费 ' + show(newWaste) + '（' + fmt(newWaste * unitPrice) + '）' : '') + '</b></div>' : '') +
-    '<div class="kv"><span>全部货用完的时间</span><b class="num">约 ' + dateAfter(oldUsed / r + newUsed / r) + '</b></div>' +
-    (plan > 0 ? '<div class="kv"><span>' + perU + '实际成本（含浪费）</span><b class="num">' + fmt(effUnit) + '（基准 ' + fmt(unitPrice) + '）</b></div>' : '') +
-    '<div class="expl"><b>结论说明：</b>' + vIc + ' ' + vTxt + (note ? ' ' + note : '') + '</div>' +
+  /* ---- 明细：先展示计算口径摘要，详细推导由用户主动展开 ---- */
+  const oldDesc = '现有 ' + amt(stock, U) + (dv.multiOld ? ' · ' + oldBs.filter(b => b.units > 0).length + ' 批' : '');
+  const dailyDesc = r >= 1 ? amt(r, U) : (r >= 0.1 ? r1(r) : Number(r.toFixed(3))) + ' ' + U;
+  html += '<div class="card calc-card"><div class="calc-heading"><h2>怎么算出这个结论</h2><span>输入 → 消耗 → 到期 → 成本</span></div>' +
+    '<div class="calc-steps">' +
+      '<div class="calc-step"><span class="step-no">1</span><div><strong>每天用多少</strong><p>约 ' + dailyDesc + '/天</p></div></div>' +
+      '<div class="calc-step"><span class="step-no">2</span><div><strong>家里还有多少</strong><p>' + oldDesc + '</p></div></div>' +
+      '<div class="calc-step"><span class="step-no">3</span><div><strong>这次买多少</strong><p>' + planSets + ' 套 · 共 ' + amt(plan, U) + '</p></div></div>' +
+      '<div class="calc-step"><span class="step-no">4</span><div><strong>到期前能用多少</strong><p>' +
+        (plan > 0 ? amt(newUsed, U) + ' 可用' + (newWaste > 0.05 ? ' · ' + amt(newWaste, U) + ' 浪费' : '') : '先填计划购买套数') +
+      '</p></div></div>' +
+    '</div>' +
+    '<details class="calc-more"><summary>查看完整数字与计算依据</summary><div class="body">' +
+      '<div class="calc-facts">' +
+        '<div><span>消耗速度</span><b>约 ' + dailyDesc + '/天</b></div>' +
+        '<div><span>每套可用</span><b>' + amt(setAmount, U) + '</b></div>' +
+        '<div><span>实际付款</span><b>' + fmt(listPrice) + ' / 套</b></div>' +
+        (arrive > 0 ? '<div><span>到货等待</span><b>' + arrive + ' 天</b></div>' : '') +
+        '<div><span>旧货</span><b>用掉 ' + amt(oldUsed, U) + (oldWaste > 0.05 ? ' · 浪费 ' + amt(oldWaste, U) : '') + '</b></div>' +
+        (plan > 0 ? '<div><span>新货 · ' + Math.round(newExp) + ' 天后到期' + assumedTag + '</span><b>用掉 ' + amt(newUsed, U) + (newWaste > 0.05 ? ' · 浪费 ' + amt(newWaste, U) : '') + '</b></div>' : '') +
+        '<div><span>全部货用完</span><b>约 ' + dateAfter(oldUsed / r + newUsed / r) + '</b></div>' +
+      '</div>' +
+      '<p class="calc-rule">先用快到期的货。实际成本按本次新货预计用掉的量计算。</p>' +
     '</div></details></div>';
 
   $('k-out').innerHTML = html;
 
-  /* ---- 供辅助工具联动的快照（oldBs：与主流程完全同一批旧货数据，比价/预售共用同口径） ---- */
+  /* ---- 供辅助工具联动的快照（oldBs：与主流程完全同一批旧货数据，比价共用同口径） ---- */
   LAST = { U, rate: r, stockAmount: stock, oldBs, oldEnd, setAmount, setPrice, listPrice, planSets, newExp, sale, unitPrice, rateDesc: dv.rateDesc,
     rec: { kind, planBand, recommend: kind === 'fit' ? setsBySale * setAmount : 0, recSets: setsBySale, recQty: setsBySale * setAmount,
       hiSets: maxSetsNoWaste, hiQty: maxSetsNoWaste * setAmount, minNeeded: shortBySale, minSetsNeeded: setsBySale,
       maxNoWaste, maxSetsNoWaste, maxNewBySale, plan, planSets, oldUsed, oldStandaloneWaste, newUsed, newWaste,
       leftAtSale, leftAtEnd, gapDays, shortQty, arrive, extraSets, extraDays, vsNormal, refMl } };
   syncCompareLabels();
-  syncVsFromMain(false);
-  renderOffers(); calcVs();
+  renderOffers();
   syncGroup();
   persist();
 }
@@ -1448,19 +1550,35 @@ const PRESETS = {
     { key: 'waste', label: '洗衣液：临期特卖买 4 箱（会浪费）', set: { perPack: 30, stock: 1, oldExp: dateStr(150), setSize: 3, setPrice: 69, planSets: 4, newExp: dateStr(90), arrive: dateToStr(todayMid()), sale: dateToStr(nextSale()) } },
   ],
 };
+let presetMode = 'count';
 function renderPresets() {
-  let html = '<span class="tip">30 秒快速开始 —— 点一个示例直接看结论：</span>';
-  PRESETS[mode].forEach(p => { html += '<button class="btn ghost sm" data-preset="' + p.key + '">' + p.label + '</button>'; });
-  $('presetRow').innerHTML = html;
-  $('presetRow').querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
-    const p = PRESETS[mode].find(x => x.key === b.dataset.preset);
-    Object.assign(state[mode], JSON.parse(JSON.stringify(p.set)));
-    state[mode].vsNormal = 'unknown';      // 换一套示例 → 价格对比与多批旧货一并复位
-    state[mode].oldBatches = [];
-    state[mode].useBatches = false;
-    state[mode].expKnown = true;
-    renderInputs(); calcCore();
-  }));
+  const scenes = $('presetScenes'), list = $('presetRow');
+  if (!scenes || !list) return;
+  const names = { count: '🧖 按次用', volume: '🧴 按体积用', pack: '🧺 按件用' };
+  scenes.innerHTML = Object.keys(names).map(k => '<button type="button" data-scene="' + k + '" aria-pressed="' + (k === presetMode) + '" class="' + (k === presetMode ? 'active' : '') + '">' + names[k] + '</button>').join('');
+  list.innerHTML = PRESETS[presetMode].map(p => '<button type="button" data-preset="' + p.key + '">' + esc(p.label) + '</button>').join('');
+  scenes.querySelectorAll('[data-scene]').forEach(b => b.addEventListener('click', () => { presetMode = b.dataset.scene; renderPresets(); }));
+  list.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => applyPreset(presetMode, b.dataset.preset)));
+}
+function applyPreset(scene, key) {
+  const p = PRESETS[scene].find(x => x.key === key);
+  if (!p) return;
+  mode = scene;
+  Object.assign(state[mode], clone(p.set));
+  state[mode].vsNormal = 'unknown';
+  state[mode].oldBatches = [];
+  state[mode].useBatches = false;
+  state[mode].expKnown = true;
+  $('modeBar').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  if (!cmpDirty) offers = clone(CMP_DEFAULTS[mode]);
+  gPackDirty = false; gMemberDirty = false;
+  closePresetDialog();
+  renderInputs(); calcCore();
+  $('sec-main').scrollIntoView({ behavior: 'smooth' });
+}
+function closePresetDialog() {
+  const dialog = $('presetDialog');
+  if (dialog && dialog.open) dialog.close();
 }
 
 /* 场景切换 */
@@ -1468,7 +1586,6 @@ $('modeBar').querySelectorAll('button').forEach(b => b.addEventListener('click',
   mode = b.dataset.mode;
   $('modeBar').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
   if (!cmpDirty) offers = clone(CMP_DEFAULTS[mode]);   // 比价方案随场景换一套贴合的示例
-  vsDirty = { a: false, b: false };                    // 预售/现货重新跟随主流程
   gPackDirty = false; gMemberDirty = false;            // 拼单大单重新跟随主流程
   renderInputs(); calcCore();
 }));
@@ -1507,7 +1624,7 @@ function resetCompare() { offers = clone(CMP_DEFAULTS[mode]); cmpDirty = false; 
 function syncCompareLabels() {
   if (!LAST.U) return;
   $('o-amountLabel').textContent = '等效总量（' + LAST.U + '）';
-  $('cmp-sync').innerHTML = '已沿用主流程：消耗速度 <b>' + LAST.rateDesc + '</b>；家里的旧货（含多批）与候选方案的新货排同一条队伍，<b>先到期先用</b>。效期填「从今天算起的天数」。';
+  $('cmp-sync').innerHTML = '已沿用主流程：消耗速度 <b>' + LAST.rateDesc + '</b>；家里的旧货（含多批）与候选方案的新货排同一条队伍，<b>先到期先用</b>。有效期填「从今天算起的天数」。';
 }
 function renderOffers() {
   const { U, rate: r, oldBs } = LAST;
@@ -1547,96 +1664,10 @@ function renderOffers() {
   const dead = rows.filter(x => x.usable <= 0.05);
   if (dead.length) {
     html += '<div class="verdict bad"><span class="ic">⚠️</span><span>' +
-      dead.map(d => esc(d.o.name)).join('、') + ' 按你的消耗速度在效期内几乎用不掉（先到期先用，与主流程同口径），买回来就是浪费，先排除。</span></div>';
+      dead.map(d => esc(d.o.name)).join('、') + ' 按你的消耗速度在有效期内几乎用不掉（先到期先用，与主流程同口径），买回来就是浪费，先排除。</span></div>';
   }
   $('offers-out').innerHTML = html;
 }
-
-/* =====================================================================
-   辅助 2：预售 vs 现货（双栏卡片 + 与主流程联动）
-===================================================================== */
-let vsDirty = { a: false, b: false };
-function syncVsFromMain(force) {
-  const { setAmount, setPrice, newExp } = LAST;
-  if (!setAmount) return;
-  if (force || !vsDirty.a) {
-    $('v-a-price').value = setPrice;
-    $('v-a-amount').value = Math.round(setAmount * 10) / 10;
-    $('v-a-gift').value = 0;
-    $('v-a-wait').value = 0;
-    $('v-a-shelf').value = Math.round(newExp);
-    if (force) vsDirty.a = false;
-  }
-  if (force || !vsDirty.b) {
-    $('v-b-price').value = Math.round(setPrice * 0.9 * 100) / 100;
-    $('v-b-amount').value = Math.round(setAmount * 10) / 10;
-    $('v-b-gift').value = 20;
-    $('v-b-wait').value = 15;
-    $('v-b-shelf').value = Math.round(newExp);
-    if (force) vsDirty.b = false;
-  }
-  updateVsTags();
-}
-function updateVsTags() {
-  if (!vsDirty.a) $('tag-a').innerHTML = '<span class="pill">联动中</span>'; else $('tag-a').innerHTML = '<span class="pill warnpill">已手动调整</span>';
-  if (!vsDirty.b) $('tag-b').innerHTML = '<span class="pill">联动中</span>'; else $('tag-b').innerHTML = '<span class="pill warnpill">已手动调整</span>';
-  $('opt-a').classList.toggle('dirty', vsDirty.a);
-  $('opt-b').classList.toggle('dirty', vsDirty.b);
-}
-function resetVsSync() { vsDirty = { a: false, b: false }; syncVsFromMain(true); calcVs(); }
-
-function calcVs() {
-  const { U, rate: r, oldBs } = LAST;
-  if (!U || !Array.isArray(oldBs)) return;
-  $('v-a-amountLabel').textContent = '每套可用量（' + U + '）';
-  $('v-b-amountLabel').textContent = '每套可用量（' + U + '）';
-  $('vs-sync').innerHTML = '已沿用主流程：消耗速度 <b>' + LAST.rateDesc + '</b>；旧货（含多批）按<b>各自真实到期日</b>参与「先到期先用」。效期从到货日算起，改动某栏后它就不再自动跟随。';
-
-  const get = k => ({ price: num('v-' + k + '-price'), amount: num('v-' + k + '-amount'), gift: num('v-' + k + '-gift'),
-    wait: num('v-' + k + '-wait'), shelf: num('v-' + k + '-shelf') });
-  const evalOpt = o => {
-    /* 口径与主流程一致：旧货用真实到期日（不是「用完日」），新货从到货日开始计效期 */
-    const sim = simulate(oldBs.concat([
-      { id: 'new', units: o.amount, expiry: o.wait + o.shelf, start: o.wait },
-    ]), r);
-    const nb = sim.byId('new');
-    const usable = nb ? nb.used : 0, waste = nb ? nb.waste : o.amount;
-    const oldEndMax = Math.max(0, ...sim.bs.filter(b => b.id !== 'new').map(b => b.end || 0));
-    const gap = Math.max(0, Math.round(o.wait - oldEndMax));
-    const net = Math.max(0, o.price - o.gift);
-    return { o, usable, waste, gap, net, perUnit: usable > 0 ? net / usable : Infinity };
-  };
-  const ra = evalOpt(get('a')), rb = evalOpt(get('b'));
-  const cheaper = ra.perUnit <= rb.perUnit ? ra : rb, other = cheaper === ra ? rb : ra;
-  const nm = x => (x === ra ? '现货' : '预售');
-
-  let html = '<div class="box">' +
-    '<div class="kv"><span>现货：实际每 ' + U + '成本</span><b class="num">' + (isFinite(ra.perUnit) ? fmt(ra.perUnit) : '用不上') +
-      (ra.gap > 0 ? '，断档 ' + ra.gap + ' 天' : '') + (ra.waste > 0.05 ? '，浪费 ' + amt(ra.waste, U) : '') + '</b></div>' +
-    '<div class="kv"><span>预售：实际每 ' + U + '成本</span><b class="num">' + (isFinite(rb.perUnit) ? fmt(rb.perUnit) : '用不上') +
-      (rb.gap > 0 ? '，断档 ' + rb.gap + ' 天' : '') + (rb.waste > 0.05 ? '，浪费 ' + amt(rb.waste, U) : '') + '</b></div>' +
-    '</div>';
-
-  const diff = Math.abs(other.perUnit - cheaper.perUnit);
-  let vTxt, cls = 'good', ic = '✅';
-  if (!isFinite(cheaper.perUnit)) {
-    cls = 'warn'; ic = '⚠️';
-    vTxt = '两边都用不上——到货时间或效期对不上你的消耗速度，先别买。';
-  } else if (diff < 0.02) {
-    cls = 'warn'; ic = '🤝';
-    vTxt = '两者实际每 ' + U + '成本几乎一样。这时优先选现货：不用等，也不用承担发货与降价风险。';
-  } else {
-    vTxt = nm(cheaper) + '更划算：每 ' + U + '实际成本 ' + fmt(cheaper.perUnit) + '，比' + nm(other) + '便宜 ' + fmt(diff) + '。';
-    if (cheaper === rb) vTxt += '（已把预售的等待与赠品差异算进去）';
-    else if (rb.gap > 0) vTxt += ' 预售标价虽低，但会断档 ' + rb.gap + ' 天——省下的钱抵不上没得用。';
-    else if (rb.waste > 0.05) vTxt += ' 预售量多吃不掉，多出的 ' + amt(rb.waste, U) + ' 把单价优势吃掉了。';
-  }
-  html += '<div class="verdict ' + cls + '"><span class="ic">' + ic + '</span><span>' + vTxt + '</span></div>';
-  $('v-out').innerHTML = html;
-}
-['a', 'b'].forEach(k => ['price', 'amount', 'gift', 'wait', 'shelf'].forEach(f => {
-  $('v-' + k + '-' + f).addEventListener('input', () => { vsDirty[k] = true; updateVsTags(); calcVs(); });
-}));
 
 /* =====================================================================
    辅助 3：囤货拼单分摊（跟随主场景的单位与规格）
@@ -1678,18 +1709,21 @@ function syncGroup(reset) {
 }
 
 function renderGroupItems() {
-  $('g-pack-head').textContent = '这一单买回来的总量（默认沿用主流程的套装规格 × ' + (gPack.sets || 1) + ' 套，可自行修改）';
+  $('g-pack-head').textContent = '规格清单 · ' + (gPack.sets || 1) + ' 套';
   const firstLabel = mode === 'volume' ? '容量（ml）' : (mode === 'count' ? '每套份数' : '每套件数');
   let h = '';
   gPack.items.forEach((it, i) => {
     h += '<div class="spec-row">' +
       '<div class="field"><label>' + firstLabel + '</label>' +
         '<input class="g-amt" data-i="' + i + '" type="number" min="0" value="' + it.amount + '"></div>' +
-      '<div class="field"><label>数量' + (mode === 'volume' ? '（瓶 / 份）' : '（套）') + '</label>' +
-        '<input class="g-qty" data-i="' + i + '" type="number" min="0" value="' + it.qty + '"></div>' +
+      '<div class="field fslide group-qty"><div class="fs-top"><label>数量</label>' +
+        '<input id="g-qty-' + i + '" class="g-qty" data-i="' + i + '" type="number" min="0" step="1" value="' + it.qty + '"></div>' +
+        '<input type="range" data-num="g-qty-' + i + '" min="0" max="20" step="1" value="' + Math.min(it.qty, 20) + '" aria-label="数量">' +
+        '<div class="fs-scale"><span>0</span><span class="fs-max" data-cap="20" data-unit="">20</span></div></div>' +
       '<button class="del" data-gdel="' + i + '" title="删除该规格">✕</button></div>';
   });
   $('g-items').innerHTML = h;
+  bindRanges($('g-items'));
   $('g-price').value = gPack.price;
   $('g-needLabel').textContent = '需要多少（' + sceneUnit() + '）';
   $('g-needUnit').style.display = mode === 'volume' ? '' : 'none';
@@ -1728,13 +1762,8 @@ function calcGroup() {
   const price = Math.max(0, gPack.price || 0);
   const avg = total > 0 ? price / total : 0;
 
-  $('g-total').textContent = show(total) + '，平均 ' + (avg > 0 ? fmt(avg) + ' / ' + U : '—');
-  const s = state[mode];
-  const specDesc = mode === 'volume'
-    ? '每套「' + (s.post.filter(p => p.ml > 0).map(p => p.ml + 'ml×' + p.qty).join(' + ') || '—') + '」'
-    : (mode === 'count' ? '每套 ' + s.setSize + ' 份' : '每套 ' + s.setSize + ' 件');
-  $('g-sync').innerHTML = '已沿用主流程：' + specDesc + '，共 <b>' + (gPack.sets || 1) + ' 套</b>，整单 ' + fmt(price) +
-    '。忽略邮费与满减——这一版只解决「囤货买回来怎么按需分」。';
+  $('g-total').textContent = show(total);
+  $('g-sync').textContent = '已沿用主流程套装，可修改规格与价格。';
 
   if (!gMembers.length) { $('g-out').innerHTML = '<div class="hint">添加拼单成员，填每个人需要的量。</div>'; return; }
 
@@ -1742,7 +1771,7 @@ function calcGroup() {
   const over = claimed > total + 1e-6;
   const unclaimed = Math.max(0, total - claimed);
 
-  let html = '<div class="tbl"><table><tr><th>成员</th><th class="num">需要</th><th class="num">占总量</th><th class="num">应摊货款</th><th></th></tr>';
+  let html = '<div class="tbl"><table class="group-table"><tr><th>成员</th><th class="num">需要</th><th class="num">占总量</th><th class="num">应摊货款</th><th></th></tr>';
   gMembers.forEach((m, i) => {
     const need = Math.max(0, m.need || 0), pay = need * avg, share = total > 0 ? need / total : 0;
     html += '<tr><td>' + esc(m.name) + '</td>' +
@@ -1752,19 +1781,17 @@ function calcGroup() {
       '<td><button class="del" onclick="delMember(' + i + ')">✕</button></td></tr>';
   });
   html += '</table></div>';
-  html += '<div class="box">' +
-    '<div class="kv"><span>整单总量 / 整单价</span><b class="num">' + show(total) + ' / ' + fmt(price) + '</b></div>' +
-    '<div class="kv"><span>已被认领</span><b class="num">' + show(claimed) + '（' + pct(total > 0 ? claimed / total : 0) +
-      '，合计 ' + fmt(claimed * avg) + '）</b></div>' +
-    '<div class="kv"><span>平均单价</span><b class="num">' + (avg > 0 ? fmt(avg) + ' / ' + U : '—') + '</b></div>' +
+  html += '<div class="group-metrics">' +
+    '<div class="group-metric"><span>整单</span><strong>' + show(total) + ' · ' + fmt(price) + '</strong></div>' +
+    '<div class="group-metric"><span>已分给成员</span><strong>' + show(claimed) + ' · ' + pct(total > 0 ? claimed / total : 0) + '</strong></div>' +
+    '<div class="group-metric"><span>每 ' + U + ' 均价</span><strong>' + (avg > 0 ? fmt(avg) : '—') + '</strong></div>' +
     '</div>';
 
   if (over) {
     html += '<div class="verdict warn"><span class="ic">⚠️</span><span>各人需要加起来（' + show(claimed) +
       '）已经超过这一单的总量（' + show(total) + '）——要么有人少拿，要么这一单得再加量。</span></div>';
   } else if (unclaimed > total * 0.001) {
-    html += '<div class="verdict warn"><span class="ic">📦</span><span>还有 <b>' + show(unclaimed) + '</b> 没人认领（约 ' +
-      fmt(unclaimed * avg) + '）。这部分默认由发起人自留；如果发起人自己用不完，就再找一个朋友分，或者干脆少买一点、换小规格。</span></div>';
+    html += '<div class="group-note">未分配：' + show(unclaimed) + '（约 ' + fmt(unclaimed * avg) + '）。可留给发起人，或继续分配。</div>';
   } else {
     html += '<div class="verdict good"><span class="ic">✅</span><span>刚好分完：每个人只为自己真正需要的量付钱，没有人为囤过头买单。</span></div>';
   }
@@ -1794,16 +1821,12 @@ const secObs = new IntersectionObserver(entries => {
 }, { rootMargin: '0px 0px -75% 0px' });
 document.querySelectorAll('section.sec').forEach(s => secObs.observe(s));
 
-/* Hero 的「载入示例」：套用当前场景第一个示例并滚到主流程 */
+/* 顶部示例入口：先按场景选择，再载入对应示例。 */
 function loadExample() {
-  const p = PRESETS[mode][0];
-  Object.assign(state[mode], JSON.parse(JSON.stringify(p.set)));
-  state[mode].vsNormal = 'unknown';
-  state[mode].oldBatches = [];
-  state[mode].useBatches = false;
-  state[mode].expKnown = true;
-  renderInputs(); calcCore();
-  $('sec-main').scrollIntoView({ behavior: 'smooth' });
+  presetMode = mode;
+  renderPresets();
+  const dialog = $('presetDialog');
+  if (dialog && !dialog.open) dialog.showModal();
 }
 
 /* ---------------- 启动 ---------------- */
